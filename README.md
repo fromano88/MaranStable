@@ -20,10 +20,10 @@ Supplementary material:
 The supplementary material is stored in the "docs" folder and contains:
 
    1) "benchmarks.pdf":   
-      In this file several test cases for verification and validation are explained, as well as a grid convergence study that demonstrating the accuracy of the software.
+      In this file several test cases for verification and validation are explained, as well as a grid convergence study demonstrating the accuracy of the software.
 
    2) "discretization.pdf":   
-      Explains discretization of the differential equations and the numerical methods and used to solve the discretized equations.
+      Explains discretization of the differential equations and the numerical methods used to solve the discretized equations.
 
    3) "flowchart.pdf":   
       Provides an overview on the main elements of MaranStable.
