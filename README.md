@@ -19,19 +19,19 @@ Supplementary material:
 
 The supplementary material is stored in the "docs" folder and contains:
 
-   1) "benchmarks.pdf":
+   1) "benchmarks.pdf":   
       In this file several test cases for verification and validation are explained, as well as a grid convergence study that demonstrating the accuracy of the software.
 
-   2) "discretization.pdf":
+   2) "discretization.pdf":   
       Explains discretization of the differential equations and the numerical methods and used to solve the discretized equations.
 
-   3) "flowchart.pdf"
+   3) "flowchart.pdf":   
       Provides an overview on the main elements of MaranStable.
       
-   4) "tutorials.pdf" (see above)
+   4) "tutorials.pdf" (see above):   
       Is a guide on how to arrive at the results presented in the main paper.
 
-   5) "VDI.pdf", "Shin-Etsu04.pdf"
+   5) "VDI.pdf", "Shin-Etsu04.pdf":   
       These files provide the temperature dependence of all material parameters implemented in MaranStable 3.1. For the silicone oils, the manufacturers do not specify the temperature dependence of the surface tension coefficient and of the kinematic viscosity. For these quantities, please see
       
       [1] I. Ueno et. al., Phys. Fluids 15, 408-416 (2003)
