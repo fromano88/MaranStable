@@ -39,6 +39,18 @@ assignin('base','p_fluid',101325);
     assignin('base','m_delta',h.m_delta);
     assignin('base','m_end',h.m_end);
     % ------------------------------------------------------------------- %
+    assignin('base','tmp',h.flowopt.eigs.krylov);
+    evalin('base','flowopt.eigs.krylov=tmp;');
+    % ------------------------------------------------------------------- %
+    assignin('base','tmp',h.flowopt.eigs.tol);
+    evalin('base','flowopt.eigs.tol=tmp;');
+    % ------------------------------------------------------------------- %
+    assignin('base','tmp',h.flowopt.eigs.maxit);
+    evalin('base','flowopt.eigs.maxit=tmp;');
+    % ------------------------------------------------------------------- %
+    assignin('base','tmp',h.flowopt.tolerance.growth);
+    evalin('base','flowopt.tolerance.growth=tmp;');
+    % ------------------------------------------------------------------- %
     assignin('base','dependent',h.dependent);
     assignin('base','T_0',h.T_0);
     assignin('base','T_init',h.T_init);

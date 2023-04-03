@@ -438,14 +438,28 @@ switch hObject
                 valueName = 'N_coeff(3)';
         end
         
-    case {h.sy.et.n_eig,h.sy.et.n_eig_c}
+    case {h.sy.et.n_eig,h.sy.et.n_eig_c,h.sy.et.kryl,h.sy.et.maxit}
         h.lowerLimit=-inf; h.upperLimit=inf; name = 'n_eig';
-        callbackName = 'sy_et_n_eig';
+        callbackName = 'sy_et_eigs';
         switch hObject
             case h.sy.et.n_eig
                 valueName = 'flowopt.eigs.n';
             case h.sy.et.n_eig_c
                 valueName = 'flowopt.eigs.n_cayley';
+            case h.sy.et.kryl
+                valueName = 'flowopt.eigs.krylov';
+            case h.sy.et.maxit
+                valueName = 'flowopt.eigs.maxit';
+        end
+
+    case {h.sy.et.tol_eigs,h.sy.et.conv}
+        h.lowerLimit=1.0e-15; h.upperLimit=inf; name = 'tolerance';
+        errormsg = 'Value must be greater or equal 1.0e-15!'; %#ok<NASGU> 
+        switch hObject
+            case h.sy.et.tol_eigs
+                valueName = 'flowopt.eigs.tol';
+            case h.sy.et.conv
+                valueName = 'flowopt.tolerance.growth';
         end
         
     case {h.sy.et.m_start,h.sy.et.m_delta,h.sy.et.m_end}
@@ -634,21 +648,21 @@ axes(h.sy.as.dependent); cla(h.sy.as.dependent); %#ok<*LAXES>
 switch h.dependent
     case 'delta_T'
         if disp_g==1 && isfield(h,'gamma')
-            text(0,0,['$\Delta T = ' num2str(h.delta_T) '\,^\circ \mathrm{C} \; \to \;\gamma_c=' num2str(-real(h.gamma(1))) '\pm ' num2str(abs(imag(h.gamma(1)))) '\,i$'],h.latex_r{:});
+            text(0,0,['$\Delta T = ' num2str(h.delta_T) '\,^\circ \mathrm{C} \; \to \;\gamma_c=' num2str(-real(h.gamma(1))) '\pm ' num2str(abs(imag(h.gamma(1)))) '\,i$ [1/s]'],h.latex_r{:});
         else
             text(0,0,['$\Delta T = ' num2str(h.delta_T) '\,^\circ$C'],h.latex_r{:});
         end
 
     case 'T_d1l'
         if disp_g==1 && isfield(h,'gamma')
-            text(0,0,['$T_{d1} = ' num2str(h.T_d1l) '\,^\circ \mathrm{C} \; \to \;\gamma_c=' num2str(-real(h.gamma(1))) '\pm ' num2str(abs(imag(h.gamma(1)))) '\,i$'],h.latex_r{:});
+            text(0,0,['$T_{d1} = ' num2str(h.T_d1l) '\,^\circ \mathrm{C} \; \to \;\gamma_c=' num2str(-real(h.gamma(1))) '\pm ' num2str(abs(imag(h.gamma(1)))) '\,i$ [1/s]'],h.latex_r{:});
         else
             text(0,0,['$T_{d1} = ' num2str(h.T_d1l) '\,^\circ$C'],h.latex_r{:});
         end
 
     case 'T_d2l'
         if disp_g==1 && isfield(h,'gamma')
-            text(0,0,['$T_{d2} = ' num2str(h.T_d2l) '\,^\circ \mathrm{C} \; \to \;\gamma_c=' num2str(-real(h.gamma(1))) '\pm ' num2str(abs(imag(h.gamma(1)))) '\,i$'],h.latex_r{:});
+            text(0,0,['$T_{d2} = ' num2str(h.T_d2l) '\,^\circ \mathrm{C} \; \to \;\gamma_c=' num2str(-real(h.gamma(1))) '\pm ' num2str(abs(imag(h.gamma(1)))) '\,i$ [1/s]'],h.latex_r{:});
         else
             text(0,0,['$T_{d2} = ' num2str(h.T_d2l) '\,^\circ$C'],h.latex_r{:});
         end
@@ -2175,7 +2189,7 @@ elseif (strcmp(selection,'Outflow') && hObject == h.bc.bg.axialSG.d1(1)) || (str
     set([h.bc.et.axialSG.d1.velocity h.bc.pm.axialSG.d1.velocity h.bc.st.axialSG.d1.velocity],'visible','off')
     set([h.bc.et.axialSG.d2.velocity h.bc.pm.axialSG.d2.velocity h.bc.st.axialSG.d2.velocity],'visible','on')
     
-elseif strcmp(selection,'Wall')
+elseif strcmp(selection,'No Penetration')
     h.b2.bc.r(1,1:2) = 'wn'; h.b2.bc.r(2,1:2) = 'wn';
     h.b2.bc.rhs.w.r{1} = '@(r)0'; h.b2.bc.rhs.w.r{2} = '@(r)0';
 
@@ -3027,7 +3041,7 @@ guidata(hObject,h)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function sy_et_n_eig(hObject, ~, ~)
+function sy_et_eigs(hObject, ~, ~)
 h = guidata(hObject);
 
 switch hObject
@@ -3038,6 +3052,7 @@ switch hObject
             end
             h.show.n_eig.warning = 0;
             h.flowopt.eigs.n = floor(abs(h.flowopt.eigs.n));
+            if h.flowopt.eigs.n == 0, h.flowopt.eigs.n = 1; end
             set(h.sy.et.n_eig,'string',num2str(h.flowopt.eigs.n))
         end
     case h.sy.et.n_eig_c
@@ -3048,6 +3063,32 @@ switch hObject
             h.show.n_eig.warning = 0;
             h.flowopt.eigs.n_cayley = floor(abs(h.flowopt.eigs.n_cayley));
             set(h.sy.et.n_eig_c,'string',num2str(h.flowopt.eigs.n_cayley))
+        end
+        if h.flowopt.eigs.n_cayley > 5 % default value
+            if h.show.n_cayley.warning == 1
+                waitfor(warndlg({'Increasing n_{cay} beyond its default value may cause a disproportional increase in computational time.','','Please reconsider changing to the default value!'},'Attention',h.opts))
+            end
+            h.show.n_cayley.warning = 0;
+        end
+    case h.sy.et.kryl
+        if floor(h.flowopt.eigs.krylov) ~= h.flowopt.eigs.krylov || h.flowopt.eigs.krylov <= 0
+            if h.show.n_eig.warning == 1
+                waitfor(warndlg('Value must be a positive integer.','Warning'))
+            end
+            h.show.n_eig.warning = 0;
+            h.flowopt.eigs.krylov = floor(abs(h.flowopt.eigs.krylov));
+            if h.flowopt.eigs.krylov == 0, h.flowopt.eigs.krylov = 1; end
+            set(h.sy.et.kryl,'string',num2str(h.flowopt.eigs.krylov))
+        end
+    case h.sy.et.maxit
+        if floor(h.flowopt.eigs.maxit) ~= h.flowopt.eigs.maxit || h.flowopt.eigs.maxit <= 0
+            if h.show.n_eig.warning == 1
+                waitfor(warndlg('Value must be a positive integer.','Warning'))
+            end
+            h.show.n_eig.warning = 0;
+            h.flowopt.eigs.maxit = floor(abs(h.flowopt.eigs.maxit));
+            if h.flowopt.eigs.maxit == 0, h.flowopt.eigs.maxit = 1; end
+            set(h.sy.et.maxit,'string',num2str(h.flowopt.eigs.maxit))
         end
 end
 
@@ -3124,6 +3165,8 @@ guidata(hObject, h);
 function sy_pb_most_d_mode(hObject, ~, ~)
 h = guidata(hObject);
 
+mk = 'km'; p = h.flowopt.ax+1; % pointer
+
 % error message if there is no basic state solution
     flg = evalin('base','exist(''b1'',''var'') && isfield(b1,''w'') && residual<1e15');
     if flg == 0
@@ -3157,9 +3200,9 @@ h = guidata(hObject);
         for m = h.m_start:h.m_delta:h.m_end
             i = i+1;
             if isfield(h.old,['gamma_m' strrep(num2str(m),'.','_')])
-                plot(complex(h.old.("gamma_m" + strrep(num2str(m),'.','_'))),'o','DisplayName',['m=' num2str(m)  ' (previous)' ],'color',h.colors(mod(i-1,size(h.colors,1))+1,:))
+                plot(complex(h.old.("gamma_m" + strrep(num2str(m),'.','_'))),'o','DisplayName',[mk(p) ' = ' num2str(m)  ' (previous)' ],'color',h.colors(mod(i-1,size(h.colors,1))+1,:))
             end
-            legend('show'); legend('Location','northwest'); ylim('auto');
+            lgnd = legend('show'); legend('Location','northwest'); set(lgnd,'Interpreter','latex'); ylim('auto');
         end
         y_lim = ylim; y_lim = max(abs(y_lim))*[-1 1]; ylim(y_lim)
         x_lim = xlim; xlim('manual'); h.hline = plot(x_lim,[0 0],'k-.','HandleVisibility','off');
@@ -3175,13 +3218,13 @@ h = guidata(hObject);
     i = 0;
     for m = h.m_start:h.m_delta:h.m_end
         i = i+1;
-        set(h.sy.st.m,'visible','on','string',['m = ' num2str(m) ' ...'])
+        set(h.sy.st.m,'visible','on','string',[mk(p) ' = ' num2str(m) ' ...'])
         pause(1)
                 
         assignin('base','m',m);
         evalin('base','flowopt.stability=1; flowopt.m=m;')
         updateValues_TFM; evalin('base','caseSetup_TFM') % problem_specification
-        evalin('base','grid_generation; block_assembly; opts.p=100; opts.maxit=300;');
+        evalin('base','grid_generation; block_assembly; opts.p=flowopt.eigs.krylov; opts.maxit=flowopt.eigs.maxit; opts.tol=flowopt.eigs.tol;');
         evalin('base','[eigenvectors,gamma] = eigs(A_stability,B_stability,flowopt.eigs.n,''sm'',opts);')
         evalin('base','gamma=diag(gamma,0);gamma=unique([gamma; conj(gamma)]);[~,index_gamma]=sort(real(gamma));gamma=gamma(index_gamma,1);')
         h.gamma_plot = evalin('base','real(gamma)*-1+imag(gamma)*1i');
@@ -3204,8 +3247,8 @@ h = guidata(hObject);
         
         h.hline.Visible = 'off'; xlim('auto'); ylim('auto'); hold on
         h.gamma_plot = complex(h.gamma_plot);
-        p = plot(h.gamma_plot,'o','DisplayName',['m=' num2str(m)],'color',h.colors(mod(i-1,size(h.colors,1))+1,:)); set(p,'MarkerFaceColor',get(p,'Color'));
-        xlabel('$s=\Re(\gamma)$ [1/s]','interpreter','latex'); ylabel('$\omega=\Im(\gamma)$ [1/s]','interpreter','latex'); legend('show'); legend('Location','northwest')
+        plt = plot(h.gamma_plot,'o','DisplayName',[mk(p) ' = ' num2str(m)],'color',h.colors(mod(i-1,size(h.colors,1))+1,:)); set(plt,'MarkerFaceColor',get(plt,'Color'));
+        xlabel('$s=\Re(\gamma)$ [1/s]','interpreter','latex'); ylabel('$\omega=\Im(\gamma)$ [1/s]','interpreter','latex'); lgnd = legend('show'); legend('Location','northwest'); set(lgnd,'Interpreter','latex')
         y_lim = ylim; y_lim = max(abs(y_lim))*[-1 1]; ylim(y_lim)
         x_lim = xlim; xlim('manual'); h.hline = plot(x_lim,[0 0],'k-.','HandleVisibility','off');
         if x_lim(1)*x_lim(2)<0
@@ -3229,7 +3272,6 @@ h = guidata(hObject);
     h.gamma = evalin('base','gamma'); ce_display_dependent(h);
 
     % show this message box only if 'most dangerous mode' was pressed
-    mk = 'km'; p = h.flowopt.ax+1;
     m_c = evalin('base','m');
     if hObject == h.sy.pb.run(1)
         helpdlg(['Most dangerous wavenumber ' mk(p) ' = ' num2str(m_c) '!'])
@@ -3316,7 +3358,7 @@ h = guidata(hObject);
     
     h.gamma = evalin('base','gamma');
     h.gamma_m = evalin('base','gamma_m');
-    tol = h.flowopt.tolerance.newton*10;
+    tol = h.flowopt.tolerance.growth;
     
 % compute gamma
     if min(real(h.gamma_m))<0
@@ -3427,13 +3469,13 @@ h = guidata(hObject);
     h.gamma = evalin('base','gamma');
     h.alpha_plus = h.alpha_plus_m;
     h.m = h.m_n(1)+h.m_start-h.m_delta;
-    disp(['m = ', num2str(h.m)])   
+    disp(['m = ', num2str(h.m)])
     h.gammaminus = h.gamma_m(1);
     h.gammaplus = h.gammaplus_m(1);
     h.gammaplus_m = h.gammaplus_m(2:end);
     h.alpha_n = h.alpha_minus;
     h.gamman = h.gammaminus;
-    while (abs(cos(h.alpha_plus)-cos(h.alpha_minus))>=tol*10 || abs(sin(h.alpha_plus)-sin(h.alpha_minus))>=tol*10) && min(abs(real(h.gamma)))>=tol*10 && get(h.sy.pb.stop,'userdata')==0
+    while (abs(cos(h.alpha_plus)-cos(h.alpha_minus))>=tol || abs(sin(h.alpha_plus)-sin(h.alpha_minus))>=tol) && min(abs(real(h.gamma)))>=tol && get(h.sy.pb.stop,'userdata')==0
         h.D = (h.alpha_minus-h.alpha_plus)/2;
         h.alpha_n = (h.alpha_minus+h.alpha_plus)/2;
         h.alpha = h.alpha_n;

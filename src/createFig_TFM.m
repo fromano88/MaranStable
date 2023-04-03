@@ -605,11 +605,11 @@
     BV = {'units','pix','BorderType','none','pos',[15 70-10*w 195 80],'parent'};
     BH = {'units','pix','BorderType','none','pos',[467 66-10*w 195 80],'parent'};
     % radio (button): wall, noSlip, slip, adiabatic, conductive
-    RW = {'style','rad','unit','pix','pos',[25 95-10*w 50 20],'string',...
-        'Wall','value',1,'enable','inactive','parent'};
+    RW = {'style','rad','unit','pix','pos',[25 95-10*w 140 20],'string',...
+        'No Penetration','value',1,'enable','inactive','parent'};
     RN = {'style','rad','unit','pix','pos',[10 50 110 20],'string',...
         'No Slip','value',1};
-    RS = {'style','rad','unit','pix','pos',[10 10 110 20],'string',...
+    RS = {'style','rad','unit','pix','pos',[10 10 140 20],'string',...
         'Slip','value',0};
     RA = {'style','rad','unit','pix','pos',[10 50 110 20],'string','Adiabatic'};
     RC = {'style','rad','unit','pix','pos',[10 10 110 20],'string',...
@@ -738,7 +738,7 @@
     h.bc.rb.axialLB.d2.conductive = uicontrol(h.bc.bg.axialLB.d2(3),RC{:});
     % --------------------------------------------------------------------
     h.bc.rb.radialLB.rc.wall       = uicontrol(h.bc.bg.radialLB.rc(1),...
-        RS{:},'string','Wall','enable','off');
+        RS{:},'string','No Penetration','enable','off');
     h.bc.rb.radialLB.rc.axis       = uicontrol(h.bc.bg.radialLB.rc(1),...
         RN{:},'string','Symmetry','enable','inactive');
     h.bc.rb.radialLB.rc.adiabatic  = uicontrol(h.bc.bg.radialLB.rc(3),RA{:});
@@ -763,13 +763,13 @@
     set([h.bc.rb.radialLB.rc.noSlip h.bc.rb.radialLB.rc.slip h.bc.rb.radialLB.rc.adiabatic h.bc.rb.radialLB.rc.conductive h.bc.rb.radialLB.ri.adiabatic],'value',0,'enable','off')
     % --------------------------------------------------------------------
     h.bc.rb.axialSG.d1.wall       = uicontrol(h.bc.bg.axialSG.d1(1),...
-        RA{:},'string','Wall','pos',[10 70 70 20]);
+        RA{:},'string','No Penetration','pos',[10 70 140 20]);
     h.bc.rb.axialSG.d1.inflow     = uicontrol(h.bc.bg.axialSG.d1(1),...
         RA{:},'string','Inflow','pos',[10 35 70 20]);
     h.bc.rb.axialSG.d1.outflow    = uicontrol(h.bc.bg.axialSG.d1(1),...
         RA{:},'string','Outflow','pos',[10 0 70 20],'value',1);
     h.bc.rb.axialSG.d2.wall       = uicontrol(h.bc.bg.axialSG.d2(1),...
-        RA{:},'string','Wall','pos',[10 70 70 20]);
+        RA{:},'string','No Penetration','pos',[10 70 140 20]);
     h.bc.rb.axialSG.d2.inflow     = uicontrol(h.bc.bg.axialSG.d2(1),...
         RA{:},'string','Inflow','pos',[10 35 70 20],'value',1);
     h.bc.rb.axialSG.d2.outflow    = uicontrol(h.bc.bg.axialSG.d2(1),...
@@ -935,11 +935,11 @@
         [10 7 190 20],'string','Use previous simulation.','parent',h.sn.bg.initialization);
     
 % edit texts
-    h.sn.et.residuals(1) = uicontrol(E{:},h.sn.pl.convergence,'string','1.0e-06');
+    h.sn.et.residuals(1) = uicontrol(E{:},h.sn.pl.convergence,'string',num2str(h.flowopt.tolerance.residuals,12));
     h.sn.et.residuals(2) = uicontrol(E{:},h.sn.pl.convergence,...
-        'string','1.0e-06','pos',[530 21 75 23]);
+        'string',num2str(h.flowopt.tolerance.newton,12),'pos',[530 21 75 23]);
     h.sn.et.steps = uicontrol(E{:},h.sn.pl.simulation(1),...
-        'string','100','pos',[110 21 75 23]);
+        'string',num2str(h.steps),'pos',[110 21 75 23]);
     
 % pushbuttons
     B = {'parent',h.sn.pl.simulation(2),'units','pix','pos',[25 24+1*w 76 25],'visible','on','string'};
@@ -1037,40 +1037,47 @@
     % panels
     P = {'units','pix','parent',h.pl.lsa,'pos'};
     % edit texts
-    E = {'style','edit','units','pix','pos',[125 70 60 23],'parent'};
+    E = {'style','edit','units','pix','pos',[60 80 60 23],'parent'};
     % static texts
     S = {'units','pix','style','text','HorizontalAlignment'};
     
 % subpanels, subpanels
-    h.sy.pl.n_eig = uipanel(P{:},[20 585-80*w 220 130],'title','Number of Eigenvalues');
-    h.sy.pl.m = uipanel(P{:},[250 585-80*w 220 130],'title','Wavenumbers');
-    h.sy.pl.parameter = uipanel(P{:},[480 585-80*w 220 130],'title','Parameter of Variation');
+    h.sy.pl.eigs = uipanel(P{:},[20 585-80*w 325 130],'title','Eigenvalue Solver');
+    h.sy.pl.m = uipanel(P{:},[355 585-80*w 145 130],'title','Wave Numbers');
+    h.sy.pl.conv = uipanel(P{:},[510 585-80*w 190 65],'title','Zero Growth Rate');
     h.sy.pl.run(1) = uipanel(P{:},[20 500-80*w 680 75],'title','Linear Stability Analysis');
     h.sy.pl.run(2) = uipanel('units','pix','parent', ...
         h.sy.pl.run(1),'pos',[340 -5 355 85]);
     
 % button groups
-    h.sy.bg.parameter = uibuttongroup('units','pix','BorderType',...
-        'none','pos',[20 10 30 100],'parent',h.sy.pl.parameter);
+    h.sy.bg.parameter = uibuttongroup(P{:},[510 653-80*w 190 62],'title','Parameter of Variation');
     
 % radio buttons
     h.sy.rb.delta_T = uicontrol('style','rad','unit','pix','pos',...
-        [10 69 15 20],'string',' ','value',1,'parent',h.sy.bg.parameter);
+        [12 15 15 20],'string',' ','value',1,'parent',h.sy.bg.parameter);
     h.sy.rb.T_d1 = uicontrol('style','rad','unit','pix','pos',...
-        [10 41 15 20],'string','  ','parent',h.sy.bg.parameter);
+        [76 15 15 20],'string','  ','parent',h.sy.bg.parameter);
     h.sy.rb.T_d2 = uicontrol('style','rad','unit','pix','pos',...
-        [10 13 15 20],'string','   ','parent',h.sy.bg.parameter);
+        [138 15 15 20],'string','   ','parent',h.sy.bg.parameter);
     
 % edit texts
-    h.sy.et.n_eig = uicontrol(E{:},h.sy.pl.n_eig,'string','12');
-    h.sy.et.n_eig_c = uicontrol(E{:},h.sy.pl.n_eig,...
-        'string','5','pos',[125 25 60 23]);
+    h.sy.et.n_eig = uicontrol(E{:},h.sy.pl.eigs,'string',num2str(h.flowopt.eigs.n));
+    h.sy.et.n_eig_c = uicontrol(E{:},h.sy.pl.eigs,...
+        'string',num2str(h.flowopt.eigs.n_cayley),'pos',[60 45 60 23]);
+    h.sy.et.kryl = uicontrol(E{:},h.sy.pl.eigs,...
+        'string',num2str(h.flowopt.eigs.krylov),'pos',[250 10 60 23]);
+    h.sy.et.tol_eigs = uicontrol(E{:},h.sy.pl.eigs,...
+        'string',num2str(h.flowopt.eigs.tol),'pos',[250 80 60 23]);
+    h.sy.et.maxit = uicontrol(E{:},h.sy.pl.eigs,...
+        'string',num2str(h.flowopt.eigs.maxit),'pos',[250 45 60 23]);
     h.sy.et.m_start = uicontrol(E{:},h.sy.pl.m,...
-        'string',num2str(h.m_start),'pos',[125 80 60 23]);
+        'string',num2str(h.m_start),'pos',[70 80 60 23]);
     h.sy.et.m_delta = uicontrol(E{:},h.sy.pl.m,...
-        'string','1','pos',[125 45 60 23],'enable','off');
+        'string','1','pos',[70 45 60 23],'enable','off');
     h.sy.et.m_end = uicontrol(E{:},h.sy.pl.m,...
-        'string',h.m_end,'pos',[125 10 60 23]);
+        'string',num2str(h.m_end),'pos',[70 10 60 23]);
+    h.sy.et.conv = uicontrol(E{:},h.sy.pl.conv,...
+        'string',num2str(h.flowopt.tolerance.growth),'pos',[89 15 60 23]);
     
 % pushbuttons
     B = {'parent',h.sy.pl.run(2),'units','pix','pos',[25 24+1*w 76 25],'visible','on','string'};
@@ -1086,14 +1093,18 @@
     h.sy.pb.plot = uicontrol(B{:},'Plot','pos',[235 24+1*w 76 25]);
     
 % axes
-    h.sy.as.n = axes(AS{:},h.sy.pl.n_eig,'pos',h.sy.et.n_eig.Position);
-    h.sy.as.n_cay = axes(AS{:},h.sy.pl.n_eig,'pos',h.sy.et.n_eig_c.Position);
+    h.sy.as.n = axes(AS{:},h.sy.pl.eigs,'pos',h.sy.et.n_eig.Position);
+    h.sy.as.n_cay = axes(AS{:},h.sy.pl.eigs,'pos',h.sy.et.n_eig_c.Position);
+    h.sy.as.kryl = axes(AS{:},h.sy.pl.eigs,'pos',h.sy.et.kryl.Position);
+    h.sy.as.tol_eigs = axes(AS{:},h.sy.pl.eigs,'pos',h.sy.et.tol_eigs.Position);
+    h.sy.as.maxit = axes(AS{:},h.sy.pl.eigs,'pos',h.sy.et.maxit.Position);
     h.sy.as.m_start = axes(AS{:},h.sy.pl.m,'pos',h.sy.et.m_start.Position);
     h.sy.as.m_delta = axes(AS{:},h.sy.pl.m,'pos',h.sy.et.m_delta.Position);
     h.sy.as.m_end = axes(AS{:},h.sy.pl.m,'pos',h.sy.et.m_end.Position);
-    h.sy.as.delta_T = axes(AS{:},h.sy.pl.parameter,'pos',[50 86 85 20]);
-    h.sy.as.T_d1 = axes(AS{:},h.sy.pl.parameter,'pos',[50 58 85 20]);
-    h.sy.as.T_d2 = axes(AS{:},h.sy.pl.parameter,'pos',[50 30 85 20]);
+    h.sy.as.delta_T = axes(AS{:},h.sy.bg.parameter,'pos',[29 23 85 20]);
+    h.sy.as.T_d1 = axes(AS{:},h.sy.bg.parameter,'pos',[93 23 85 20]);
+    h.sy.as.T_d2 = axes(AS{:},h.sy.bg.parameter,'pos',[155 23 85 20]);
+    h.sy.as.conv = axes(AS{:},h.sy.pl.conv,'pos',h.sy.et.conv.Position);
     h.sy.as.eigs = axes(AS{:},h.pl.lsa,'pos',[75 83-20*w 610 354-60*w]);
     h.sy.as.dependent = axes(AS{:},h.pl.lsa,'pos',[75 460-80*w 60 23]);
     
@@ -1177,4 +1188,4 @@ h.editTextBoxes = {h.gl.et.g h.gl.et.Vr h.gy.et.ld1 h.gy.et.llb ...
     h.bc.et.axialSG.d1.velocity h.bc.et.axialSG.d2.velocity ...
     h.sn.et.residuals(1) h.sn.et.residuals(2) h.sn.et.steps ...
     h.or.et.ray h.or.et.particle h.or.et.N(1) h.or.et.N(2) h.or.et.N(3) ...
-    h.sy.et.n_eig h.sy.et.n_eig_c h.sy.et.m_start h.sy.et.m_delta h.sy.et.m_end};
+    h.sy.et.n_eig h.sy.et.n_eig_c h.sy.et.kryl h.sy.et.tol_eigs h.sy.et.maxit h.sy.et.m_start h.sy.et.m_delta h.sy.et.m_end h.sy.et.conv};

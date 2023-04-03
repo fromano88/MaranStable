@@ -447,6 +447,10 @@ h.m_delta = evalin('base','m_delta');
 h.m_end = evalin('base','m_end');
 h.flowopt.eigs.n = evalin('base','flowopt.eigs.n');
 h.flowopt.eigs.n_cayley = evalin('base','flowopt.eigs.n_cayley');
+h.flowopt.eigs.krylov = evalin('base','flowopt.eigs.krylov');
+h.flowopt.eigs.maxit = evalin('base','flowopt.eigs.maxit');
+h.flowopt.eigs.tol = evalin('base','flowopt.eigs.tol');
+h.flowopt.tolerance.growth = evalin('base','flowopt.tolerance.growth');
 h.dependent = evalin('base','dependent');
 switch h.dependent
     case 'delta_T'
@@ -460,11 +464,15 @@ switch h.dependent
         set(h.sy.rb.T_d2,'value',1)
 end
 %
-set(h.sy.et.m_start,'string',num2str(h.m_start,15))
-set(h.sy.et.m_delta,'string',num2str(h.m_delta,15))
-set(h.sy.et.m_end,'string',num2str(h.m_end,15))
+set(h.sy.et.m_start,'string',num2str(h.m_start,12))
+set(h.sy.et.m_delta,'string',num2str(h.m_delta,12))
+set(h.sy.et.m_end,'string',num2str(h.m_end,12))
 set(h.sy.et.n_eig,'string',num2str(h.flowopt.eigs.n))
 set(h.sy.et.n_eig_c,'string',num2str(h.flowopt.eigs.n_cayley))
+set(h.sy.et.kryl,'string',num2str(h.flowopt.eigs.krylov))
+set(h.sy.et.maxit,'string',num2str(h.flowopt.eigs.maxit))
+set(h.sy.et.tol_eigs,'string',num2str(h.flowopt.eigs.tol))
+set(h.sy.et.conv,'string',num2str(h.flowopt.tolerance.growth))
 if ax == 1
     set(h.sy.et.m_delta,'enable','off')
 else

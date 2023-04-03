@@ -30,6 +30,18 @@ assignin('base','p_fluid',101325);
     assignin('base','tmp',h.flowopt.eigs.n_cayley);
     evalin('base','flowopt.eigs.n_cayley=tmp;');
     % ------------------------------------------------------------------- %
+    assignin('base','tmp',h.flowopt.eigs.krylov);
+    evalin('base','flowopt.eigs.krylov=tmp;');
+    % ------------------------------------------------------------------- %
+    assignin('base','tmp',h.flowopt.eigs.tol);
+    evalin('base','flowopt.eigs.tol=tmp;');
+    % ------------------------------------------------------------------- %
+    assignin('base','tmp',h.flowopt.eigs.maxit);
+    evalin('base','flowopt.eigs.maxit=tmp;');
+    % ------------------------------------------------------------------- %
+    assignin('base','tmp',h.flowopt.tolerance.growth);
+    evalin('base','flowopt.tolerance.growth=tmp;');
+    % ------------------------------------------------------------------- %
     assignin('base','m_start',h.m_start);
     assignin('base','m_delta',h.m_delta);
     assignin('base','m_end',h.m_end);

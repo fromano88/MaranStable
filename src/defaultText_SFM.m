@@ -200,10 +200,19 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%% stability panel %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     axes(h.sy.as.n);
-    text(h.tp_l,h.tp_y,'$n = $',h.latex_l{:})
+    text(h.tp_l,h.tp_y,'$n_\mathrm{eig} = $',h.latex_l{:})
     % ----------------------------------------------------------------- %
     axes(h.sy.as.n_cay);
-    text(h.tp_l,h.tp_y,'$n_\mathrm{cayley} = $',h.latex_l{:})
+    text(h.tp_l,h.tp_y,'$n_\mathrm{cay} = $',h.latex_l{:})
+    % ----------------------------------------------------------------- %
+    axes(h.sy.as.kryl);
+    text(h.tp_l+0.09,h.tp_y,'Krylov dimension = ',h.latex_l{:},'FontSize',10)
+    % ----------------------------------------------------------------- %
+    axes(h.sy.as.tol_eigs);
+    text(h.tp_l+0.09,h.tp_y,'Tolerance = ',h.latex_l{:},'FontSize',10)
+    % ----------------------------------------------------------------- %
+    axes(h.sy.as.maxit);
+    text(h.tp_l+0.09,h.tp_y,'Max. Iterations = ',h.latex_l{:},'FontSize',10)
     % ----------------------------------------------------------------- %
     axes(h.sy.as.m_start);
     text(h.tp_l,h.tp_y,'$m_\mathrm{start} = $',h.latex_l{:})
@@ -222,3 +231,7 @@
     % ----------------------------------------------------------------- %
     axes(h.sy.as.T_d2);
     text(0,0,'$T_{d2}$',h.latex_r{:})
+    % ----------------------------------------------------------------- %
+    axes(h.sy.as.conv);
+    text(h.tp_l+0.09,h.tp_y,'Tolerance = ',h.latex_l{:},'FontSize',10)
+    text(h.tp_r-0.03,h.tp_y,'1/s',h.latex_r{:},'FontSize',10)

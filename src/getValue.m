@@ -81,5 +81,5 @@ str = get(hObject,'string'); [number, status]=str2num(str);
         showMessage.error = [];
         showMessage.warning = [];
     end
-    set(hObject,'string',num2str(number,16));
+    set(hObject,'string',num2str(number,12));
 end

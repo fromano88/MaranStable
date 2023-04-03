@@ -14,13 +14,13 @@ for n=1:length(blocks)
             phi_T  = 0;                                % homogeneous direction
             z_T    = b1.geom.z(1)+0.5*diff(b1.geom.z); % center of "LB"
             block_T_max = plus_cc(b.T_hat.T,m,phi_T);
-            block_T_max = b.T_hat.T(abs(block_T_max)==max(max(abs(block_T_max))));
+            block_T_max = unique(b.T_hat.T(abs(block_T_max)==max(max(abs(block_T_max)))));
 
             time_conv_energy = 0;
             phi_conv_energy  = 0;
             z_conv_energy    = b1.geom.z(1)+0.5*diff(b1.geom.z);
             block_conv_energy_max = plus_cc(b.conv_energy_hat,m,phi_conv_energy);
-            block_conv_energy_max = b.conv_energy_hat(abs(block_conv_energy_max)==max(max(abs(block_conv_energy_max))));
+            block_conv_energy_max = unique(b.conv_energy_hat(abs(block_conv_energy_max)==max(max(abs(block_conv_energy_max)))));
 
         elseif m ~= 0
             time_T = 0;
@@ -46,7 +46,11 @@ for n=1:length(blocks)
     
         else
             phi_T  = 0;
-            time_T = -atan((real(b.T_hat.T)*real(gamma(1,1)) - imag(b.T_hat.T)*imag(gamma(1,1)))./(real(b.T_hat.T)*imag(gamma(1,1)) + imag(b.T_hat.T)*real(gamma(1,1))))/imag(gamma(1,1));
+            if imag(gamma(1,1)) == 0
+                time_T = zeros(size(b.T.T));
+            else
+                time_T = -atan((real(b.T_hat.T)*real(gamma(1,1)) - imag(b.T_hat.T)*imag(gamma(1,1)))./(real(b.T_hat.T)*imag(gamma(1,1)) + imag(b.T_hat.T)*real(gamma(1,1))))/imag(gamma(1,1));
+            end
             block_T_max = plus_cc(b.T_hat.T,0,0,gamma,time_T);
             time_T = time_T(abs(block_T_max)==max(max(abs(block_T_max))));
             z_T    = b.Z.T(abs(block_T_max)==max(max(abs(block_T_max))));
@@ -56,7 +60,11 @@ for n=1:length(blocks)
             end
     
             phi_conv_energy  = 0;
-            time_conv_energy = -atan((real(b.conv_energy_hat)*real(gamma(1,1)) - imag(b.conv_energy_hat)*imag(gamma(1,1)))./(real(b.conv_energy_hat)*imag(gamma(1,1)) + imag(b.conv_energy_hat)*real(gamma(1,1))))/imag(gamma(1,1));
+            if imag(gamma(1,1)) == 0
+                time_conv_energy = zeros(size(b.conv_energy_hat));
+            else
+                time_conv_energy = -atan((real(b.conv_energy_hat)*real(gamma(1,1)) - imag(b.conv_energy_hat)*imag(gamma(1,1)))./(real(b.conv_energy_hat)*imag(gamma(1,1)) + imag(b.conv_energy_hat)*real(gamma(1,1))))/imag(gamma(1,1));
+            end
             block_conv_energy_max = plus_cc(b.conv_energy_hat,0,0,gamma,time_conv_energy);
             time_conv_energy = time_conv_energy(abs(block_conv_energy_max)==max(max(abs(block_conv_energy_max))));
             z_conv_energy    = b.Z.T(abs(block_conv_energy_max)==max(max(abs(block_conv_energy_max))));
@@ -81,6 +89,9 @@ for n=1:length(blocks)
         end
         if max(isinf(phi_conv_energy)) == 1
             phi_conv_energy = 0;
+        end
+        if max(isinf(block_T_max)) == 1
+            block_T_max = 0;
         end
     
         T_ex = plus_cc(block_T_max,m,phi_T,gamma,time_T);

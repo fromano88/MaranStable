@@ -9,11 +9,15 @@
     h.flowopt.creeping            = 0;
     h.flowopt.boussinesq          = 0;
     % -----------------------------------------
-    h.flowopt.tolerance.residuals = 1.0e-6;
-    h.flowopt.tolerance.newton    = 1.0e-6;
+    h.flowopt.tolerance.residuals = 1e-6;
+    h.flowopt.tolerance.newton    = 1e-6;
+    h.flowopt.tolerance.growth    = 1e-5;
     h.flowopt.g                   = 0*9.81;
     h.flowopt.eigs.n              = 12;
     h.flowopt.eigs.n_cayley       = 5;
+    h.flowopt.eigs.tol            = 1e-14;
+    h.flowopt.eigs.maxit          = 300;
+    h.flowopt.eigs.krylov         = 100;
     % -----------------------------------------
     h.NS = 3; % 1...Boussinesq, 2...linear on T, 3...fully temperature dep.
 
@@ -145,7 +149,7 @@
 % every message box which is listed here will be shown only once
     % edit texts - save writings
         % inputValues
-            sw = ["g","V_r","l_lb","r_c","r_i","spacing","stretchingC","temperature","residuals","steps","r_0","z_p","N","n_eig","m_start","m_delta","m_end","m"];
+            sw = ["g","V_r","l_lb","r_c","r_i","spacing","stretchingC","temperature","residuals","steps","r_0","z_p","N","n_eig","m_start","m_delta","m_end","m","n_cayley","tolerance"];
             for i = 1:length(sw)
                 h.show.(sw(i)).error   = 1;
                 h.show.(sw(i)).warning = 1;
