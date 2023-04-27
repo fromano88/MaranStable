@@ -1,6 +1,7 @@
 V_r = h.V_r;
 g   = h.flowopt.g; ax = h.flowopt.ax;
 surface = h.b1.bc.z(2,2);
+bc_r0   = h.b1.bc.z(1,1);
 r_c     = h.r_c;
 delta_T = h.temperature.ri_d1-h.temperature.ri_d2;
 energy  = h.flowopt.energy;
@@ -11,9 +12,11 @@ r_i = 3.5; r_C = r_i*0.2;
 l_d2 = 3.2; l_lb = 2.8; l_d1 = 3.4;
 d = 0.1;
 l.orgn = r_i/4; l.g = 1;
-vPos.rc = 0.63*l_lb; vPos.ri = 0.4*l_d2;
+vPos.rc = 0.15*l_lb; vPos.ri = 0.6*l_d2;
+hPos.l_lb = 0.48*r_i;
 n.lines = 15; n.colors = 100;
 color.liquid = [181 255 255]./255; color.liquid_light = [218 255 255]./255;
+%-------------------------------------------------------%
 
 if energy == 0
     color.up   = 0.3+[0 0 0];
@@ -80,10 +83,10 @@ color.CTable = [color.liquid_light; color.liquid];
 cmap.liquid = interp2(sketch.x0,sketch.y0,color.CTable,sketch.xn,sketch.yn);
 z_vec = fliplr(linspace(0,l_lb));
 if r_c==0 && ax==1
-    fill([0 r_i+f(z_vec) 0],l_d2+[0 fliplr(z_vec) l_lb],[1 zeros(size(z_vec)) 1])
+    fill([0 r_i+f(z_vec) 0],l_d2+[0 fliplr(z_vec) l_lb],[1 zeros(size(z_vec)) 1],'LineStyle','none')
     colormap(h.as.sketch,cmap.liquid)
 else
-    fill([0 r_i+f(z_vec) 0],l_d2+[0 fliplr(z_vec) l_lb],color.liquid_light)
+    fill([0 r_i+f(z_vec) 0],l_d2+[0 fliplr(z_vec) l_lb],color.liquid_light,'LineStyle','none')
 end
 plot(f(linspace(0,l_lb))+r_i,flip(linspace(0,l_lb))+l_d2,'lineWidth',w,'color',color.liquid)
 
@@ -121,9 +124,17 @@ else
     rectangle('Position',[0 0 r_i l_d2],'FaceColor',color.down_light,'LineStyle','none');
 end
 
-% dimensioning vectors for r_i & r_o
-plot([0 r_i-3*d],vPos.ri*[1 1],'lineWidth',w,'color','k')
-fill(r_i-3*d*[1 0 1],vPos.ri+d*[-1 0 1],'k','LineStyle','none')
+% dimensioning vectors for r_i
+plot([0 r_i],vPos.ri*[1 1],'lineWidth',w*0.7,'color','k')
+fill(r_i-2.5*d*[1 0 1 0.6],vPos.ri+0.75*d*[-1 0 1 0],'k','LineStyle','none')
+if ax == 0 && strcmp(bc_r0,'w')
+    fill(2.5*d*[1 0 1 0.6],vPos.ri-0.75*d*[-1 0 1 0],'k','LineStyle','none')
+end
+
+% dimensioning vector for d (l_lb)
+plot(hPos.l_lb*[1 1],l_d2+[0 l_lb],'lineWidth',w*0.7,'color','k')
+fill(hPos.l_lb+0.75*d*[-1 0 1 0],l_d2+l_lb-2.5*d*[1 0 1 0.6],'k','LineStyle','none')
+fill(hPos.l_lb+0.75*d*[-1 0 1 0],l_d2+2.5*d*[1 0 1 0.6],'k','LineStyle','none')
 
 % lines for the rods
 plot([0 r_i],[0 0],'color',color.down,'lineWidth',w)
@@ -158,12 +169,22 @@ if r_c ~= 0
         plot(r_C*[1 1],l_d2+z_vec(i:i+1),'Color',cmap.line(i,:),'LineWidth',w)
     end
     
-    plot([0 r_C-3*d],l_d2+vPos.rc*[1 1],'color','k','lineWidth',w)
-    fill(r_C-3*d*[1 0 1],l_d2+vPos.rc+d*[-1 0 1],'k','LineStyle','none')
+    plot([0 r_C],l_d2+vPos.rc*[1 1],'color','k','lineWidth',0.7*w)
+    fill(r_C-2.0*d*[1 0 1 0.6],l_d2+vPos.rc+0.75*d*[-1 0 1 0],'k','LineStyle','none')
+    if ax == 0 && strcmp(bc_r0,'w')
+        fill(2.0*d*[1 0 1 0.6],l_d2+vPos.rc+0.75*d*[-1 0 1 0],'k','LineStyle','none')
+    end
 end
 
 % symmetry line
-plot([0 0],[-r_i/n.lines l_ges+r_i/n.lines],'color','k','lineWidth',w*0.5,'lineStyle','-.')
+if ax == 0 && strcmp(bc_r0,'w')
+    plot([0 0],[0 l_ges],'color','k','lineWidth',w*0.75)
+    for i = 0:(n.lines*l_ges/r_i)
+        plot([-r_i/n.lines 0],r_i/n.lines*[i-1 i],'lineWidth',w*0.25,'color','k')
+    end
+else
+    plot([0 0],[-r_i/n.lines l_ges+r_i/n.lines],'color','k','lineWidth',w*0.5,'lineStyle','-.')
+end
 
 % coordinate system
 plot([0 l.orgn],l_d2+l_lb/2*[1 1],'lineWidth',1.2*w,'color','k')

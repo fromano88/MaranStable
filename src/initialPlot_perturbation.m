@@ -40,7 +40,7 @@ end
     end
 
 % default values for vector plot
-    h.vp.draw = 1; h.vp.color = '[0 0 0]';
+    h.vp.draw = 0; h.vp.color = '[0 0 0]';
     h.vp.numPhi = 20;
     if evalin('base','length(blocks)') == 2
         h.vp.numR = 30; h.vp.numZ = 40;

@@ -235,7 +235,7 @@ if h.flowopt.energy == 1
     % copied from es_bg_energy function
     % set visibility on of everything that is connected to temperature
         % Liquid Bridge - radial Direction
-        if h.r_c ~= 0 && strcmp(h.b1.bc.z(1,3),'c')
+        if (h.r_c>0 || h.flowopt.ax==0) && strcmp(h.b1.bc.z(1,3),'c')
             set([h.bc.et.radialLB.rc.temperature h.bc.pm.radialLB.rc.temperature h.bc.st.radialLB.rc.temperature],'visible','on')
         end
         % Liquid Bridge - axial Direction
@@ -269,14 +269,12 @@ if h.flowopt.energy == 1
 
     % change radio buttons that are connected to temperature
         % Liquid Bridge - radial Direction
-        if h.r_c ~= 0
-            if strcmp(h.b1.bc.z(1,3),'c')
-                set(h.bc.rb.radialLB.rc.adiabatic,'Value',0,'Enable','on')
-                set(h.bc.rb.radialLB.rc.conductive,'Value',1,'Enable','on')
-            else
-                set(h.bc.rb.radialLB.rc.adiabatic,'Value',1,'Enable','on')
-                set(h.bc.rb.radialLB.rc.conductive,'Value',0,'Enable','on')
-            end
+        if strcmp(h.b1.bc.z(1,3),'c')
+            set(h.bc.rb.radialLB.rc.adiabatic,'Value',0,'Enable','on')
+            set(h.bc.rb.radialLB.rc.conductive,'Value',1,'Enable','on')
+        else
+            set(h.bc.rb.radialLB.rc.adiabatic,'Value',1,'Enable','on')
+            set(h.bc.rb.radialLB.rc.conductive,'Value',0,'Enable','on')
         end
         % ---------------------------------------------------------- %
         set([h.bc.rb.radialLB.ri.conductive h.bc.rb.axialLB.d1.adiabatic h.bc.rb.axialLB.d1.conductive h.bc.rb.axialLB.d2.adiabatic h.bc.rb.axialLB.d2.conductive h.bc.rb.radialSG.d1.adiabatic h.bc.rb.radialSG.d1.conductive h.bc.rb.radialSG.d2.adiabatic h.bc.rb.radialSG.d2.conductive h.bc.rb.radialSG.ro.adiabatic h.bc.rb.radialSG.ro.conductive h.bc.rb.axialSG.d1.adiabatic h.bc.rb.axialSG.d1.conductive h.bc.rb.axialSG.d2.adiabatic h.bc.rb.axialSG.d2.conductive],'Enable','on')
@@ -352,11 +350,7 @@ h.b1.bc.z = evalin('base','b1.bc.z');
 h.b1.bc.r = evalin('base','b1.bc.r');
 h.b2.bc.z = evalin('base','b2.bc.z');
 h.b2.bc.r = evalin('base','b2.bc.r');
-if h.r_c == 0
-    h.b1.bc.z = ['a   '; h.b1.bc.z{2}];
-else
-    h.b1.bc.z = [[h.b1.bc.z{1} ' ']; h.b1.bc.z{2}];
-end
+h.b1.bc.z = [[h.b1.bc.z{1} ' ']; h.b1.bc.z{2}];
 h.b1.bc.r = [h.b1.bc.r{1}; h.b1.bc.r{2}];
 h.b2.bc.z = [h.b2.bc.z{1}; '   '; h.b2.bc.z{3}; h.b2.bc.z{4}];
 h.b2.bc.r = [h.b2.bc.r{1}; h.b2.bc.r{2}];
@@ -557,10 +551,19 @@ else
 end
 %
 if h.r_c == 0
-    set(h.bc.rb.radialLB.rc.axis,'Value',1,'Enable','inactive')
-    set([h.bc.rb.radialLB.rc.wall h.bc.rb.radialLB.rc.noSlip h.bc.rb.radialLB.rc.slip h.bc.rb.radialLB.rc.adiabatic h.bc.rb.radialLB.rc.conductive],'Value',0,'Enable','off')
-    cla(h.bc.as.radialLB.rc(2),'reset');
-    set([h.bc.as.radialLB.rc(2) h.bc.et.radialLB.rc.temperature h.bc.pm.radialLB.rc.temperature h.bc.st.radialLB.rc.temperature],'visible','off')
+    if h.flowopt.ax == 1
+        set(h.bc.rb.radialLB.rc.axis,'Value',1,'Enable','inactive')
+        set([h.bc.rb.radialLB.rc.wall h.bc.rb.radialLB.rc.noSlip h.bc.rb.radialLB.rc.slip h.bc.rb.radialLB.rc.adiabatic h.bc.rb.radialLB.rc.conductive],'Value',0,'Enable','off')
+        cla(h.bc.as.radialLB.rc(2),'reset');
+        set([h.bc.as.radialLB.rc(2) h.bc.et.radialLB.rc.temperature h.bc.pm.radialLB.rc.temperature h.bc.st.radialLB.rc.temperature],'visible','off')
+    else
+        set([h.bc.rb.radialLB.rc.axis h.bc.rb.radialLB.rc.wall],'Enable','on')
+        if strcmp(h.b1.bc.z(1,1),'a')
+            set(h.bc.rb.radialLB.rc.axis,'Value',1)
+        else
+            set(h.bc.rb.radialLB.rc.wall,'Value',1)
+        end
+    end
 else
     set(h.bc.rb.radialLB.rc.axis,'Value',0,'Enable','off')
     set(h.bc.rb.radialLB.rc.wall,'Value',1,'Enable','inactive')

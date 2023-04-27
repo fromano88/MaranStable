@@ -48,12 +48,13 @@ set([h.es.cb.stokes h.es.cb.marangoni],'call',{@es_cbs,h})
 set(h.bc.pm.headline,'call',{@bc_pm_headline,h})
 set([h.bc.buttonGroups.velocity{:}],'SelectionChangedFcn',{@bc_bg_velocity,h})
 set([h.bc.buttonGroups.temperature{:}],'SelectionChangedFcn',{@bc_bg_temperature,h})
+set(h.bc.bg.radialLB.rc(1),'SelectionChangedFcn',{@bc_bg_axis,h})
 set(h.bc.bg.radialLB.ri(1),'SelectionChangedFcn',{@bc_bg_surface,h})
 set([h.bc.popupMenus.temperature{:}],'call',{@bc_pm_temperature,h})
 set([h.bc.et.axialLB.d1.temperature h.bc.et.axialLB.d2.temperature h.bc.et.radialLB.rc.temperature],'ButtonDownFcn',{@bc_pm_temperature,h})
 set(h.sn.bg.initialization,'SelectionChangedFcn',{@sn_bg_initialization,h})
 set(h.sn.pb.run,'call',{@sn_pb_run,h})
-set([h.sn.pb.pause h.sn.pb.load h.sn.pb.save h.sn.pb.plot h.sy.pb.load h.sy.pb.save h.sy.pb.plot],'call',{@sn_pbs,h})
+set([h.sn.pb.stop h.sn.pb.load h.sn.pb.save h.sn.pb.plot h.sy.pb.load h.sy.pb.save h.sy.pb.plot],'call',{@sn_pbs,h})
 set(h.or.pb.run,'call',{@or_pb_run,h})
 set(h.sy.bg.parameter,'SelectionChangedFcn',{@sy_bg_parameter,h})
 set(h.sy.pb.run(1),'call',{@sy_pb_most_d_mode,h})
@@ -393,7 +394,7 @@ try
         evalin('base','plotResiduals')
         residual = evalin('base', 'residual');
         dx = evalin('base', 'dx');
-        if (residual <= h.flowopt.tolerance.residuals && norm(dx) <= h.flowopt.tolerance.newton) || isnan(residual) || residual>10^15 , break, end
+        if (residual <= h.flowopt.tolerance.residuals && norm(dx) <= h.flowopt.tolerance.newton) || isnan(residual) || residual>10^15  || get(h.sy.pb.stop,'userdata'), break, end
     end
 catch
     waitfor(errordlg('Simulation stopped!','Error 201'))
@@ -404,6 +405,12 @@ evalin('base','old.x=x;')
 
 if residual > 10^15 || isnan(residual)
     errordlg('Simulation stopped!','Error 201')
+elseif get(h.sy.pb.stop,'userdata')
+    set(h.sy.st.run,'String','running ...','visible','off')
+    set(h.sy.pb.run(2),'Visible','on')
+    set(h.sy.pb.stop,'Visible','off')
+    helpdlg('Simulation stopped!','Notice')
+    set([h.tabs{:} h.sy.et.n_eig h.sy.et.n_eig_c h.sy.et.m_start h.sy.et.m_delta h.sy.et.m_end h.sy.rb.delta_T h.sy.rb.T_d1 h.sy.rb.T_d2 h.sy.pb.run(1) h.sy.pb.run(2) h.sy.pb.load h.sy.pb.save h.sy.pb.plot],'Enable','on')
 end
 
 function h = sy_update_parameter(h)
@@ -499,6 +506,33 @@ switch selection
     case 'Planar'
         h.flowopt.ax=0;
         set(h.sy.et.m_delta,'enable','on')
+        if ispc
+            txt_wavenumber = 'Wave Numbers along z';
+        else
+            txt_wavenumber = 'Wave Numbers in z';
+        end
+
+        h.b1.bc.z(1,1) = 'w';
+        set([h.bc.rb.radialLB.rc.noSlip h.bc.rb.radialLB.rc.slip],'Enable','on')
+        set(h.bc.rb.radialLB.rc.wall,'Value',1)
+        if strcmp(h.b1.bc.z(1,2),'s')
+            set(h.bc.rb.radialLB.rc.slip,'Value',1)
+            h.b1.bc.z(1,2) = 's';
+        else
+            set(h.bc.rb.radialLB.rc.noSlip,'Value',1)
+            h.b1.bc.z(1,2) = 'n';
+        end
+    
+        % conductive or adiabatic if enery equation turned on
+        if get(h.es.cb.energy,'value')
+            h.b1.bc.z(1,3) = 'c';
+            set(h.bc.rb.radialLB.rc.adiabatic,'Value',0,'Enable','on')
+            set(h.bc.rb.radialLB.rc.conductive,'Value',1,'Enable','on')
+            set([h.bc.et.radialLB.rc.temperature h.bc.pm.radialLB.rc.temperature h.bc.st.radialLB.rc.temperature],'visible','on')
+        else
+            h.b1.bc.z(1,3) = 'a';
+            set([h.bc.rb.radialLB.rc.adiabatic h.bc.rb.radialLB.rc.conductive],'Value',0,'Enable','off')
+        end
 
     case 'Axisymmetric'
         h.flowopt.ax=1;
@@ -506,7 +540,27 @@ switch selection
         set(h.sy.et.m_start,'string',num2str(h.m_start))
         set(h.sy.et.m_delta,'string',num2str(h.m_delta),'enable','off')
         set(h.sy.et.m_end,'string',num2str(h.m_end))
+        if ispc
+            txt_wavenumber = 'Wave Numbers along φ';
+        else
+            txt_wavenumber = 'Wave Numbers in φ';
+        end
+
+        if h.r_c == 0
+            h.b1.bc.z(1,1:3) = 'a  ';
+            % no further b.c.s can be imposed at r=0 except symmetry condition
+            set(h.bc.rb.radialLB.rc.axis,'Value',1)
+            set([h.bc.rb.radialLB.rc.noSlip h.bc.rb.radialLB.rc.slip h.bc.rb.radialLB.rc.adiabatic h.bc.rb.radialLB.rc.conductive],'Value',0,'Enable','off')
+        
+             % cancel visibility of imposed temperature profile at r=0
+            cla(h.bc.as.radialLB.rc(2),'reset');
+            set([h.bc.as.radialLB.rc(2) h.bc.et.radialLB.rc.temperature h.bc.pm.radialLB.rc.temperature h.bc.st.radialLB.rc.temperature],'visible','off')
+        end
 end
+
+set(h.sy.pl.m,'title',txt_wavenumber);
+
+h = ce_updateFunctions(h);
 
 guidata(hObject, h);
 
@@ -697,18 +751,20 @@ end
     
 % changing from anular to pure liquid bridge and vice versa
 if h.r_c == 0
-    h.b1.bc.z(1,1) = 'a';
-     % no further b.c.s can be imposed at r=0 except symmetry condition
-        set(h.bc.rb.radialLB.rc.axis,'Value',1,'Enable','on')
-        set([h.bc.rb.radialLB.rc.wall h.bc.rb.radialLB.rc.noSlip h.bc.rb.radialLB.rc.slip h.bc.rb.radialLB.rc.adiabatic h.bc.rb.radialLB.rc.conductive],'Value',0,'Enable','off')
-
-     % cancel visibility of imposed temperature profile at r=0
+    if h.flowopt.ax == 1
+        h.b1.bc.z(1,1:3) = 'a  ';
+         % no further b.c.s can be imposed at r=0 except symmetry condition
+        set(h.bc.rb.radialLB.rc.axis,'Value',1)
+        set([h.bc.rb.radialLB.rc.noSlip h.bc.rb.radialLB.rc.slip h.bc.rb.radialLB.rc.adiabatic h.bc.rb.radialLB.rc.conductive],'Value',0,'Enable','off')
+    
+         % cancel visibility of imposed temperature profile at r=0
         cla(h.bc.as.radialLB.rc(2),'reset');
         set([h.bc.as.radialLB.rc(2) h.bc.et.radialLB.rc.temperature h.bc.pm.radialLB.rc.temperature h.bc.st.radialLB.rc.temperature],'visible','off')
+
+    end
 else
     h.b1.bc.z(1,1) = 'w';
     % wall at r=r_c
-        set(h.bc.rb.radialLB.rc.axis,'Value',0,'Enable','off')
         set([h.bc.rb.radialLB.rc.noSlip h.bc.rb.radialLB.rc.slip],'Enable','on')
         if strcmp(h.b1.bc.z(1,2),'s')
             set(h.bc.rb.radialLB.rc.slip,'Value',1)
@@ -717,7 +773,7 @@ else
             set(h.bc.rb.radialLB.rc.noSlip,'Value',1)
             h.b1.bc.z(1,2) = 'n';
         end
-        set(h.bc.rb.radialLB.rc.wall,'Value',1,'Enable','inactive')
+        set(h.bc.rb.radialLB.rc.wall,'Value',1)
 
     % conductive or adiabatic if enery equation turned on
         if get(h.es.cb.energy,'value')
@@ -1166,7 +1222,7 @@ if h.flowopt.energy == 1
             
     % set visibility on of everything that is connected to temperature
         % Liquid Bridge - radial Direction
-        if h.r_c ~= 0 && strcmp(h.b1.bc.z(1,3),'c')
+        if (h.r_c>0 || h.flowopt.ax==0) && strcmp(h.b1.bc.z(1,3),'c')
             set([h.bc.et.radialLB.rc.temperature h.bc.pm.radialLB.rc.temperature h.bc.st.radialLB.rc.temperature],'visible','on')
         end
         % ---------------------------------------------------------- %
@@ -1184,7 +1240,7 @@ if h.flowopt.energy == 1
             
     % change radio buttons that are connected to temperature
         % Liquid Bridge - radial Direction
-        if h.r_c ~= 0
+        if h.r_c>0 || h.flowopt.ax==0
             if strcmp(h.b1.bc.z(1,3),'c')
                 set(h.bc.rb.radialLB.rc.adiabatic,'Value',0,'Enable','on')
                 set(h.bc.rb.radialLB.rc.conductive,'Value',1,'Enable','on')
@@ -1440,6 +1496,54 @@ switch selection
         axes(h.bc.as.radialLB.Bi); cla(h.bc.as.radialLB.Bi)
         text(h.tp_l,h.tp_y,'$\mathrm{Bi}=$',h.latex_l{:})
 end
+
+guidata(hObject,h)
+
+function bc_bg_axis(hObject, ~, ~)
+h = guidata(hObject);
+
+selection = get(get(hObject,'SelectedObject'),'String');
+switch selection
+    case 'Symmetry'
+        if h.r_c > 0
+            rx = 'xr'; p = h.flowopt.ax + 1;
+            waitfor(warndlg(['Please, first set ' rx(p) '_c to 0 before using this boundary condition!'],'Warning',h.opts))
+            set(h.bc.rb.radialLB.rc.wall,'value',1)
+            return
+        end
+
+        h.b1.bc.z(1,1:3) = 'a  ';
+        set([h.bc.rb.radialLB.rc.noSlip h.bc.rb.radialLB.rc.slip h.bc.rb.radialLB.rc.adiabatic h.bc.rb.radialLB.rc.conductive],'Value',0,'Enable','off')
+    
+         % cancel visibility of imposed temperature profile at r=0
+        cla(h.bc.as.radialLB.rc(2),'reset');
+        set([h.bc.as.radialLB.rc(2) h.bc.et.radialLB.rc.temperature h.bc.pm.radialLB.rc.temperature h.bc.st.radialLB.rc.temperature],'visible','off')
+        
+    case 'No Penetration'
+        if h.flowopt.ax == 1
+            waitfor(warndlg('Please, first select a non-zero value for r_c before using this boundary condition.','Warning',h.opts))
+            set(h.bc.rb.radialLB.rc.axis,'value',1)
+            return
+        end
+
+        h.b1.bc.z(1,1:2) = 'wn';
+        set(h.bc.rb.radialLB.rc.slip,'Value',0,'Enable','on')
+        set(h.bc.rb.radialLB.rc.noSlip,'Value',1,'Enable','on')
+
+        if h.flowopt.energy == 1
+            h.b1.bc.z(1,3) = 'c';
+            set(h.bc.rb.radialLB.rc.adiabatic,'Value',0,'Enable','on')
+            set(h.bc.rb.radialLB.rc.conductive,'Value',1,'Enable','on')
+            set([h.bc.et.radialLB.rc.temperature h.bc.pm.radialLB.rc.temperature h.bc.st.radialLB.rc.temperature],'visible','on')
+        else
+            h.b1.bc.z(1,3) = 'a';
+            set([h.bc.rb.radialLB.rc.adiabatic h.bc.rb.radialLB.rc.conductive],'Value',0,'Enable','off')
+        end
+
+end
+
+updateSketch_SFM
+updateText_SFM
 
 guidata(hObject,h)
 
@@ -1725,47 +1829,12 @@ h = guidata(hObject);
         return
     end
 
-    % check if there are some discontinuous temperature jumps in the rod's corners
-    numberOfJumps = 0;
-    if h.flowopt.energy == 1
-        if h.r_c ~= 0
-            temperatureProfile = str2func(h.b1.bc.rhs.T.z{1});
-            if round(h.temperature.rc_d1,10) ~= round(temperatureProfile(0),10) && strcmp(h.b1.bc.r(1,3),'c') && strcmp(h.b1.bc.z(1,3),'c')
-                numberOfJumps = numberOfJumps + 1;
-                pos_jump(numberOfJumps,:) = ["r_C","l_d2+l_lb"];
-            end
-            if round(h.temperature.rc_d2,10) ~= round(temperatureProfile(h.l_lb),10) && strcmp(h.b1.bc.r(2,3),'c') && strcmp(h.b1.bc.z(1,3),'c')
-                numberOfJumps = numberOfJumps + 1;
-                pos_jump(numberOfJumps,:) = ["r_C","l_d2"]; %#ok<NASGU> 
-            end
-        end
-
-        if numberOfJumps == 1
-            updated = 'jump'; updateSketch_SFM %#ok<NASGU>
-            answer = questdlg({['Discontinuous temperature jump at ' num2str(numberOfJumps) ' position of the rod''s surface.'], 'The position is marked by a yellow circle in the sketch.', '', 'Continue anyway?'},'','Yes','Cancel','Cancel');
-        elseif numberOfJumps > 1
-            updated = 'jump'; updateSketch_SFM %#ok<NASGU>
-            answer = questdlg({['Discontinuous temperature jumps at ' num2str(numberOfJumps) ' positions of the rod''s surface.'], 'The positions are marked by yellow circles in the sketch.', '', 'Continue anyway?'},'','Yes','Cancel','Cancel');
-        else
-            answer = 'Yes';
-        end
-        if numberOfJumps ~= 0
-            set(pt(:),'visible','off'); %#ok<USENS> 
-        end
-        switch answer
-            case 'Yes'
-                % do nothing
-            case 'Cancel'
-                close(wb)
-                return
-        end
-    end
     waitbar(3/3)
     close(wb)
 
 % changing button options
     set(h.sn.st.run,'String','running...')
-    set([h.sn.st.run h.sn.pb.pause],'visible','on')
+    set([h.sn.st.run h.sn.pb.stop],'visible','on')
     set(h.sn.pb.run,'Visible','off')
     axes(h.sy.as.eigs); cla(h.sy.as.eigs,'reset'); set(h.sy.as.eigs,'visible','off')
     axes(h.sy.as.dependent); cla(h.sy.as.dependent,'reset'); set(h.sy.as.dependent,'visible','off')
@@ -1790,7 +1859,7 @@ h = guidata(hObject);
         evalin('base','flowopt.stability=0; grid_generation; block_assembly');
     catch
         errordlg('Initialization failed.','Error 158')
-        set([h.sn.st.run h.sn.pb.pause],'visible','off')
+        set([h.sn.st.run h.sn.pb.stop],'visible','off')
         set(h.sn.pb.run,'Visible','on')
         set([h.tabs{:} h.sn.et.residuals(1) h.sn.et.residuals(2) h.sn.rb.standard h.sn.rb.previous h.sn.et.steps h.sn.pb.load h.sn.pb.save h.sn.pb.plot],'Enable','on')
         return
@@ -1800,7 +1869,7 @@ h = guidata(hObject);
         evalin('base','res.u_vec = []; res.w_vec = []; res.T_vec = []; res.conti_vec = []; res.newton_vec = [];')
     end
 
-    set(h.sn.pb.pause,'userdata',0);
+    set(h.sn.pb.stop,'userdata',0);
     try
         for iteration = 1:h.steps
             assignin('base','iteration',iteration)
@@ -1811,12 +1880,12 @@ h = guidata(hObject);
             evalin('base','plotResiduals')
             residual = evalin('base', 'residual');
             dx = evalin('base', 'dx');
-            if (residual <= h.flowopt.tolerance.residuals && norm(dx) <= h.flowopt.tolerance.newton) || isnan(residual) || residual>10^15 || get(h.sn.pb.pause, 'userdata'), break, end
+            if (residual <= h.flowopt.tolerance.residuals && norm(dx) <= h.flowopt.tolerance.newton) || isnan(residual) || residual>10^15 || get(h.sn.pb.stop,'userdata'), break, end
         end
     catch
         errordlg('Simulation stopped!','Error 201')
         set([h.tabs{:} h.sn.et.residuals(1) h.sn.et.residuals(2) h.sn.rb.standard h.sn.rb.previous h.sn.et.steps h.sn.pb.load h.sn.pb.save h.sn.pb.plot],'Enable','on')
-        set([h.sn.st.run h.sn.pb.pause],'visible','off')
+        set([h.sn.st.run h.sn.pb.stop],'visible','off')
         set(h.sn.pb.run,'Visible','on')
         return
     end
@@ -1832,6 +1901,8 @@ h = guidata(hObject);
     elseif residual > 10^15 || isnan(residual)
         errordlg('Simulation stopped!','Error 201')
         h.initialize = 'standard';
+    elseif get(h.sn.pb.stop,'userdata')
+        helpdlg('Simulation stopped!','Notice')
     end
 
     if strcmp(h.initialize,'previous')
@@ -1841,7 +1912,7 @@ h = guidata(hObject);
     end
 
     set([h.tabs{:} h.sn.et.residuals(1) h.sn.et.residuals(2) h.sn.rb.standard h.sn.rb.previous h.sn.et.steps h.sn.pb.load h.sn.pb.save h.sn.pb.plot],'Enable','on')
-    set([h.sn.st.run h.sn.pb.pause],'visible','off')
+    set([h.sn.st.run h.sn.pb.stop],'visible','off')
     set(h.sn.pb.run,'Visible','on')
 
 guidata(hObject,h)
@@ -1850,8 +1921,8 @@ function sn_pbs(hObject, ~, ~)
 h = guidata(hObject);
 
 switch hObject
-    case h.sn.pb.pause
-        set(h.sn.pb.pause,'userdata',1)
+    case h.sn.pb.stop
+        set(h.sn.pb.stop,'userdata',1)
         
     case {h.sn.pb.load,h.sy.pb.load}
         set([h.sn.st.run h.sy.st.run],'String','loading...','visible','on')
@@ -2300,7 +2371,7 @@ h = guidata(hObject);
 % equal during search for critical mode
     T_d1l = str2double(h.b1.bc.rhs.T.r{1}(5:end));
     T_d2l = str2double(h.b1.bc.rhs.T.r{2}(5:end));
-    if h.r_c > 0
+    if h.r_c>0 || h.flowopt.ax==0
         T_rc = str2double(h.b1.bc.rhs.T.z{1}(5:end));
     else
         T_rc = NaN;
@@ -2362,6 +2433,9 @@ h = guidata(hObject);
             
             % basic_state
             ce_basic_state(h)
+            if get(h.sy.pb.stop,'userdata')
+                return
+            end
             
             % most dangerous mode
             guidata(hObject,h); sy_pb_most_d_mode(hObject); h = guidata(hObject);
@@ -2413,6 +2487,9 @@ h = guidata(hObject);
             
             % basic_state
             ce_basic_state(h)
+            if get(h.sy.pb.stop,'userdata')
+                return
+            end
             
             % most dangerous mode
             guidata(hObject,h); sy_pb_most_d_mode(hObject); h = guidata(hObject);
@@ -2470,6 +2547,9 @@ h = guidata(hObject);
         
         % basic_state
         ce_basic_state(h)
+        if get(h.sy.pb.stop,'userdata')
+            return
+        end
             
         % most dangerous mode
         guidata(hObject,h); sy_pb_most_d_mode(hObject); h = guidata(hObject);
@@ -2487,6 +2567,9 @@ h = guidata(hObject);
         
         % basic_state
         ce_basic_state(h)
+        if get(h.sy.pb.stop,'userdata')
+            return
+        end
             
         % most dangerous mode
         guidata(hObject,h); sy_pb_most_d_mode(hObject); h = guidata(hObject);

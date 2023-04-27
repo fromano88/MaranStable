@@ -227,9 +227,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%% boundary conditions panel %%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if h.flowopt.ax == 1
-        set(h.bc.pm.headline,'string',{'radial';'axial'})
+        set(h.bc.pm.headline,'string',{'inner/outer','top/bottom'})
     else
-        set(h.bc.pm.headline,'string',{'horizontal';'vertical'})
+        set(h.bc.pm.headline,'string',{'left/right','top/bottom'})
     end
 % --------------------------------------------------------------------- %
 % -------------------------radial-Liquid-Bridge------------------------ %
@@ -241,7 +241,7 @@
         text(0.4,0.52,['At $\,' rx(p) ' = ' rx(p) '_c: \, \, \, \, -d/2 \leq ' zy(p) ' \leq d/2$'],h.latex_r{:})
     end
     %-------------------------------------------------------------------%
-    if get(h.es.cb.energy,'value') && strcmp(h.b1.bc.z(1,3),'c') && h.r_c ~= 0
+    if get(h.es.cb.energy,'value') && strcmp(h.b1.bc.z(1,3),'c')
         axes(h.bc.as.radialLB.rc(2)); cla(h.bc.as.radialLB.rc(2));
         text(0.94*h.tp_r,h.tp_y,'$^\circ$C',h.latex_r{:})
         if get(h.bc.pm.radialLB.rc.temperature,'value') == 1

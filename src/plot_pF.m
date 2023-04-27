@@ -35,7 +35,7 @@ initialPlot_perturbation
     h.ct.pl.position(2) = uipanel('units','pix','pos',h.ct.pl.position(1).Position,'title','Position','Visible','off');
     h.ct.pl.position(3) = uipanel('units','pix','pos',h.ct.pl.position(1).Position,'title','Position','Visible','off');
     h.ct.pl.domain(1)   = uipanel('units','pix','pos',[995-27*w 517-79*w 296-5*w 86-10*w],'title','Domain');
-    h.ct.pl.quantity    = uipanel('units','pix','pos',[995-27*w 403-47*w 296-5*w 110-32*w],'title','Field Quantity');
+    h.ct.pl.quantity    = uipanel('units','pix','pos',[995-27*w 403-47*w 296-5*w 110-32*w],'title','Contour Plot');
     h.ct.pl.vector      = uipanel('units','pix','pos',[995-27*w 238-32*w 296-5*w 161-15*w],'title','Velocity Vectors');
     h.ct.pl.lines(1)    = uipanel('units','pix','pos',[995-27*w 41-2*w 296-5*w 193-30*w],'title','Isolines - Basic State');
     
@@ -58,7 +58,7 @@ initialPlot_perturbation
     h.ct.cb.LB = uicontrol(C{:},h.ct.pl.domain(1),'pos',[20 43-5*w 130 20],'String','Liquid Phase','value',1,'call',{@ct_cb_domain,h});
     h.ct.cb.SG = uicontrol(C{:},h.ct.pl.domain(1),'pos',[20 12-3*w 130 20],'String','Gas Phase','value',1,'call',{@ct_cb_domain,h});
     h.ct.cb.equal = uicontrol(C{:},h.ct.pl.domain(2),'pos',[20 31-4*w 130 20],'String','Equal Axis','value',1,'call',{@ct_cb_equal,h});
-    h.ct.cb.vector = uicontrol(C{:},h.ct.pl.vector,'pos',[20 118-10*w 50 20],'String','On','value',1,'call',{@ct_cb_vector,h});
+    h.ct.cb.vector = uicontrol(C{:},h.ct.pl.vector,'pos',[20 118-10*w 50 20],'String','Off','value',0,'call',{@ct_cb_vector,h});
     h.ct.cb.iso_sf_bS = uicontrol(C{:},h.ct.pl.lines(1),'pos',[8 141-22*w 100 20],'String','Streamlines','value',h.sf_bS,'call',{@ct_cb_isolines,h});
     h.ct.cb.iso_temp_bS = uicontrol(C{:},h.ct.pl.lines(1),'pos',[8 107-19*w 160 20],'String','Temperature','value',h.temp_bS,'call',{@ct_cb_isolines,h});
     h.ct.cb.iso_prod_pF = uicontrol(C{:},h.ct.pl.lines(2),'pos',[8 48-5*w 160 20],'String','Th. Production','value',h.prod_pF,'call',{@ct_cb_isolines,h});
@@ -71,8 +71,8 @@ initialPlot_perturbation
     h.ct.et.position(1) = uicontrol(E{:},h.ct.pl.position(1),'pos',[60 8 80 23],'string',num2str(h.ct.phi),'call',{@ct_et_position,h});
     h.ct.et.position(2) = uicontrol(E{:},h.ct.pl.position(2),'pos',[60 8 80 23],'string',num2str(h.ct.z),'call',{@ct_et_position,h});
     h.ct.et.position(3) = uicontrol(E{:},h.ct.pl.position(3),'pos',[60 8 80 23],'string',num2str(h.ct.r),'call',{@ct_et_position,h});
-    h.ct.et.vector(1) = uicontrol(E{:},h.ct.pl.vector,'pos',[195-20*w 86-5*w 60 23],'string',num2str(h.vp.numR),'call',{@ct_et_arrows,h});
-    h.ct.et.vector(2) = uicontrol(E{:},h.ct.pl.vector,'pos',[195-20*w 55-5*w 60 23],'string',num2str(h.vp.numZ),'call',{@ct_et_arrows,h});
+    h.ct.et.vector(1) = uicontrol(E{:},h.ct.pl.vector,'pos',[195-20*w 86-5*w 60 23],'string',num2str(h.vp.numR),'enable','off','call',{@ct_et_arrows,h});
+    h.ct.et.vector(2) = uicontrol(E{:},h.ct.pl.vector,'pos',[195-20*w 55-5*w 60 23],'string',num2str(h.vp.numZ),'enable','off','call',{@ct_et_arrows,h});
     h.ct.et.iso_sf_bS = uicontrol(E{:},h.ct.pl.lines(1),'pos',[122 141-22*w 60 23],'string',num2str(h.iso_sf_bS),'enable','off','call',{@ct_et_isolines,h});
     h.ct.et.iso_temp_bS = uicontrol(E{:},h.ct.pl.lines(1),'pos',[122 105-19*w 60 23],'string',num2str(h.iso_temp_bS),'enable','off','call',{@ct_et_isolines,h});
     h.ct.et.iso_prod_pF = uicontrol(E{:},h.ct.pl.lines(2),'pos',[122 46-5*w 60 23],'string',num2str(h.iso_prod_pF),'enable','off','call',{@ct_et_isolines,h});
@@ -85,7 +85,7 @@ initialPlot_perturbation
         h.ct.pm.quantity = uicontrol(h.ct.pl.quantity,'style','pop','pos',[14 55-20*w 150 24],'string',{'u - Velocity','v - Velocity','w - Velocity','Pressure','None'},'call',{@ct_pm_quantity,h});
     end
     h.ct.pm.colormap = uicontrol(h.ct.pl.quantity,'style','pop','pos',[94 14-10*w 115 24],'string',{'Cold2Warm','Cool2Warm','Rainbow','Parula','Thermal','Inferno','Black&White'},'call',{@ct_pm_colormap,h});
-    h.ct.pm.color(1) = uicontrol(h.ct.pl.vector,'style','pop','pos',[70 15-5*w 84 24],'string',{'Black','Blue','Green','Red','White'},'call',{@ct_pm_color,h});
+    h.ct.pm.color(1) = uicontrol(h.ct.pl.vector,'style','pop','pos',[70 15-5*w 84 24],'string',{'Black','Blue','Green','Red','White'},'enable','off','call',{@ct_pm_color,h});
     h.ct.pm.color(2) = uicontrol(h.ct.pl.lines(1),'style','pop','pos',[196 141-24*w 84 23],'string',{'Black','Blue','Green','Red','White'},'enable','off','call',{@ct_pm_color,h});
     h.ct.pm.color(3) = uicontrol(h.ct.pl.lines(1),'style','pop','pos',[196 105-21*w 84 23],'string',{'Black','Blue','Green','Red','White'},'enable','off','call',{@ct_pm_color,h});
     h.ct.pm.color(4) = uicontrol(h.ct.pl.lines(2),'style','pop','pos',[196 46-7*w 84 23],'string',{'Black','Blue','Green','Red','White'},'enable','off','call',{@ct_pm_color,h});

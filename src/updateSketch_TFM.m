@@ -3,40 +3,38 @@
     drawSketch_TFM
     
 % labeling sketch
-    text(3.6,7.7,'$d_{1}$',h.Latex{:})
-    text(3.6,2.7,'$d_{2}$',h.Latex{:})
+    text(1.76,4,'$d$',h.Latex{:},'FontSize',20)
+    text(4.1,7.7,'$d_{1}$',h.Latex{:},'FontSize',20)
+    text(4.1,1.7,'$d_{2}$',h.Latex{:},'FontSize',20)
     if strcmp(h.b2.bc.r(1,1),'i')
-        text(5.5,9.8,'$\bar{w}_\mathrm{g}$',h.Latex{:})
+        text(5.5,9.8,'$\bar{w}_\mathrm{g}$',h.Latex{:},'FontSize',20)
     elseif strcmp(h.b2.bc.r(1,1),'o')
-        text(5.5,-0.3,'$\bar{w}_\mathrm{g}$',h.Latex{:})
+        text(5.5,-0.3,'$\bar{w}_\mathrm{g}$',h.Latex{:},'FontSize',20)
     end
     
     if h.flowopt.g > 0
-        text(6.2,6.2,'$g$',h.Latex{:})
+        text(6.2,6.2,'$g$',h.Latex{:},'FontSize',20)
     elseif h.flowopt.g < 0
-        text(6.2,6.2,'$g$',h.Latex{:})
+        text(6.2,6.2,'$g$',h.Latex{:},'FontSize',20)
     end
     
     if h.flowopt.ax == 1
-        text(-0.4,5.8,'$z$',h.LATEX{:})
-        text(1,4.9,'$r$',h.LATEX{:})
-        text(1.2,2.15,'$r_i$',h.Latex{:})
-        text(1.2,1.2,'$r_o$',h.Latex{:})
+        text(0.12,5.8,'$z$',h.Latex{:})
+        text(1,4.9,'$r$',h.Latex{:})
+        text(1.5,2.12,'$r_i$',h.Latex{:},'FontSize',20)
+        text(1.5,1.17,'$r_o$',h.Latex{:},'FontSize',20)
     else
-        text(-0.4,5.8,'$y$',h.LATEX{:})
-        text(1,4.9,'$x$',h.LATEX{:})
-        text(1.2,2.15,'$x_i$',h.Latex{:})
-        text(1.2,1.2,'$x_o$',h.Latex{:})
+        text(0.12,5.8,'$y$',h.Latex{:})
+        text(1,4.9,'$x$',h.Latex{:})
+        text(1.5,2.12,'$x_i$',h.Latex{:},'FontSize',20)
+        text(1.5,1.17,'$x_o$',h.Latex{:},'FontSize',20)
     end
 
-    if h.r_c == 0
-        text(0.1,3.7,'$d$',h.Latex{:})
-    else
-        text(0.7,3.7,'$d$',h.Latex{:})
+    if h.r_c > 0
         if h.flowopt.ax == 1
-            text(0.1,5.3,'$r_c$',h.Latex{:})
+            text(0.17,3.85,'$r_c$',h.Latex{:},'FontSize',20)
         else
-            text(0.1,5.3,'$x_c$',h.Latex{:})
+            text(0.17,3.85,'$x_c$',h.Latex{:},'FontSize',20)
         end
     end
     
@@ -59,29 +57,40 @@ if exist('updated','var') == 1
             end
 
         case 'l_d1'
-            plt = plot(r_i*[1 1],l_ges-[l_d1 0],'color',color,'lineWidth',2*w);
+            plt  = plot(hPos.l_d1*[1 1],l_d2+l_lb+[0 l_d1],'lineWidth',w*0.7,'color',color);
+            plt2 = fill(hPos.l_d1+0.75*d*[-1 0 1 0],l_ges-2.5*d*[1 0 1 0.6],color,'LineStyle','none');
+            plt3 = fill(hPos.l_d1+0.75*d*[-1 0 1 0],l_d2+l_lb+2.5*d*[1 0 1 0.6],color,'LineStyle','none');
 
         case 'l_lb'
-            if h.r_c == 0
-                plt = plot([0 0],l_d2+[0 l_lb],'color',color,'lineWidth',2*w);
-            else
-                plt = plot(r_C+[0 0],l_d2+[0 l_lb],'color',color,'lineWidth',2*w);
-            end
+            plt = plot(hPos.l_lb*[1 1],l_d2+[0 l_lb],'lineWidth',w*0.7,'color',color);
+            plt2 = fill(hPos.l_lb+0.75*d*[-1 0 1 0],l_d2+l_lb-2.5*d*[1 0 1 0.6],color,'LineStyle','none');
+            plt3 = fill(hPos.l_lb+0.75*d*[-1 0 1 0],l_d2+2.5*d*[1 0 1 0.6],color,'LineStyle','none');
 
         case 'l_d2'
-            plt = plot(r_i*[1 1],[0 l_d2],'color',color,'lineWidth',2*w);
+            plt  = plot(hPos.l_d1*[1 1],[0 l_d1],'lineWidth',w*0.7,'color',color);
+            plt2 = fill(hPos.l_d1+0.75*d*[-1 0 1 0],l_d2-2.5*d*[1 0 1 0.6],color,'LineStyle','none');
+            plt3 = fill(hPos.l_d1+0.75*d*[-1 0 1 0],2.5*d*[1 0 1 0.6],color,'LineStyle','none');
 
         case 'r_c'
-            plt = plot([0 r_C-3*d],l_d2+vPos.rc*[1 1],'color',color,'lineWidth',w);
-            plt2 = fill(r_C-3*d*[1 0 1],l_d2+vPos.rc+d*[-1 0 1],color,'LineStyle','none');
+            plt = plot([0 r_C],l_d2+vPos.rc*[1 1],'color',color,'lineWidth',w);
+            plt2 = fill(r_C-2.0*d*[1 0 1 0.6],l_d2+vPos.rc+0.75*d*[-1 0 1 0],color,'LineStyle','none');
+            if ax == 0 && strcmp(bc_r0,'w')
+                plt3 = fill(2.0*d*[1 0 1 0.6],l_d2+vPos.rc+0.75*d*[-1 0 1 0],color,'LineStyle','none');
+            end
 
         case 'r_i'
-            plt = plot([0 r_i-3*d],vPos.ri*[1 1],'lineWidth',w,'color',color);
-            plt2 = fill(r_i-3*d*[1 0 1],vPos.ri+d*[-1 0 1],color,'LineStyle','none');
+            plt = plot([0 r_i],vPos.ri*[1 1],'lineWidth',0.7*w,'color',color);
+            plt2 = fill(r_i-2.5*d*[1 0 1 0.6],vPos.ri+0.75*d*[-1 0 1 0],color,'LineStyle','none');
+            if ax == 0 && strcmp(bc_r0,'w')
+                plt3 = fill(2.5*d*[1 0 1 0.6],vPos.ri-0.75*d*[-1 0 1 0],color,'LineStyle','none');
+            end
 
         case 'r_o'
-            plt = plot([0 r_i+delta_r-3*d],vPos.ro*[1 1],'lineWidth',w,'color',color);
-            plt2 = fill(r_i+delta_r-3*d*[1 0 1],vPos.ro+d*[-1 0 1],color,'LineStyle','none');
+            plt = plot([0 r_i+delta_r],vPos.ro*[1 1],'lineWidth',0.7*w,'color',color);
+            plt2 = fill(r_i+delta_r-2.5*d*[1 0 1 0.6],vPos.ro+0.75*d*[-1 0 1 0],color,'LineStyle','none');
+            if ax == 0 && strcmp(bc_r0,'w')
+                plt3 = fill(2.5*d*[1 0 1 0.6],vPos.ro-0.75*d*[-1 0 1 0],color,'LineStyle','none');
+            end
             
         case 'w_in'            
             if w_in > 0
@@ -92,10 +101,6 @@ if exist('updated','var') == 1
                 plt2 = fill(r_i+0.5*delta_r+d*[-1 0 1],l.in/2+[0 3*d 0],color,'lineWidth',1.5*w,'EdgeColor',color);
             end
             
-        case 'jump'
-            for i = 1:numberOfJumps
-                pt(i) = rectangle('Position',[eval(pos_jump(i,1))-d eval(pos_jump(i,2))-d 2*d 2*d],'Curvature',[1 1],'FaceColor',[1 1 0],'lineWidth',w);
-            end
     end
     pause(t_pause)
     if exist('plt','var') == 1
@@ -103,5 +108,8 @@ if exist('updated','var') == 1
     end
     if exist('plt2','var') == 1
         set(plt2,'visible','off')
+    end
+    if exist('plt3','var') == 1
+        set(plt3,'visible','off')
     end
 end

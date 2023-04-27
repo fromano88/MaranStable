@@ -82,7 +82,7 @@ initialPlot_basicState
     h.ct.cb.SG = uicontrol(C{:},h.ct.pl.domain(1),'pos',[20 14-5*w 130 20],'String','Gas Phase','value',1,'call',{@ct_cb_domain,h});
     h.ct.cb.equal = uicontrol(C{:},h.ct.pl.domain(2),'pos',[20 32-4*w 130 20],'String','Equal Axis','value',1,'call',{@ct_cb_equal,h});
     h.ct.cb.vector = uicontrol(C{:},h.ct.pl.vector,'pos',[20 128-5*w 50 20],'String','Off','call',{@ct_cb_vector,h});
-    h.ct.cb.streamlines = uicontrol(C{:},h.ct.pl.lines(1),'pos',[20 132-22*w 100 20],'String','Streamlines','value',1,'call',{@ct_cb_isolines,h});
+    h.ct.cb.streamlines = uicontrol(C{:},h.ct.pl.lines(1),'pos',[20 132-22*w 100 20],'String','Streamlines','value',0,'call',{@ct_cb_isolines,h});
     h.ct.cb.temperatureIsolines = uicontrol(C{:},h.ct.pl.lines(2),'pos',[20 51-5*w 160 20],'String','Temperature','call',{@ct_cb_isolines,h});
     if evalin('base','flowopt.energy') == 0
         set(h.ct.cb.temperatureIsolines,'enable','off')
@@ -94,7 +94,7 @@ initialPlot_basicState
 % edit texts
     h.ct.et.vector(1) = uicontrol(E{:},h.ct.pl.vector,'pos',[195-20*w 91-5*w 60 23],'string',num2str(h.vp.numR),'enable','off','call',{@ct_et_arrows,h});
     h.ct.et.vector(2) = uicontrol(E{:},h.ct.pl.vector,'pos',[195-20*w 55-5*w 60 23],'string',num2str(h.vp.numZ),'enable','off','call',{@ct_et_arrows,h});
-    h.ct.et.streamlines = uicontrol(E{:},h.ct.pl.lines(1),'pos',[140 130-22*w 60 23],'string',num2str(h.numStreamlines),'call',{@ct_et_isolines,h});
+    h.ct.et.streamlines = uicontrol(E{:},h.ct.pl.lines(1),'pos',[140 130-22*w 60 23],'string',num2str(h.numStreamlines),'enable','off','call',{@ct_et_isolines,h});
     h.ct.et.temperatureIsolines = uicontrol(E{:},h.ct.pl.lines(2),'pos',[140 49-5*w 60 23],'string',num2str(h.numTemperatureIsolines),'enable','off','call',{@ct_et_isolines,h});
     % --------------------------------------------------------------------
     h.lp.et.pos = uicontrol(E{:},h.lp.pl.pos(2),'pos',[162 35 60 23],'string',num2str(h.lp.sum),'call',{@lp_et_sr_pos,h});
@@ -111,7 +111,7 @@ initialPlot_basicState
     end
     h.ct.pm.colormap = uicontrol(h.ct.pl.quantity,'style','pop','pos',[94 14-5*w 115 24],'string',{'Cool2Warm','Cold2Warm','Rainbow','Parula','Thermal','Inferno','Black&White'},'call',{@ct_pm_colormap,h});
     h.ct.pm.color(1) = uicontrol(h.ct.pl.vector,'style','pop','pos',[70 14-5*w 84 24],'string',{'Black','Blue','Green','Red','White'},'enable','off','call',{@ct_pm_color,h});
-    h.ct.pm.color(2) = uicontrol(h.ct.pl.lines(1),'style','pop','pos',[117 97-22*w 84 24],'string',{'Black','Blue','Green','Red','White'},'enable','on','call',{@ct_pm_color,h});
+    h.ct.pm.color(2) = uicontrol(h.ct.pl.lines(1),'style','pop','pos',[117 97-22*w 84 24],'string',{'Black','Blue','Green','Red','White'},'enable','off','call',{@ct_pm_color,h});
     h.ct.pm.color(3) = uicontrol(h.ct.pl.lines(2),'style','pop','pos',[117 14-4*w 84 24],'string',{'Black','Blue','Green','Red','White'},'enable','off','call',{@ct_pm_color,h});
     % --------------------------------------------------------------------
     quantities = ["Temperature","u - Velocity","w - Velocity","Velocity Magnitude","Pressure","Surface Deformation","Normal Heat Flux"];
@@ -706,6 +706,10 @@ switch hObject
         h.streamlines = get(hObject,'Value');
 
         if get(hObject,'Value')
+            sf = evalin('base','sf');
+            if max(abs(sf)) < 1e-15
+                waitfor(warndlg('The maximum absolute value of the stream function is less than 10^{-15}. Thus, the streamlines may be affected by round-off errors.','Warning',h.opts))
+            end
             set([h.ct.et.streamlines h.ct.pm.color(2)],'enable','on')
         else
             set([h.ct.et.streamlines h.ct.pm.color(2)],'enable','off')

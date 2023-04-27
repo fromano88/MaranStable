@@ -14,13 +14,10 @@ assignin('base','tmp',h.flowopt.boussinesq);
 evalin('base','flowopt.boussinesq=tmp;');
 % ------------------------------------------------------------------- %
 assignin('base','r_c',h.r_c);
-assignin('base','d_c',h.r_c*2);
 % ------------------------------------------------------------------- %
 assignin('base','r_i',h.r_i);
-assignin('base','d_i',h.r_i*2);
 % ------------------------------------------------------------------- %
 assignin('base','r_o',h.r_o);
-assignin('base','d_o',h.r_o*2);
 % ------------------------------------------------------------------- %
 assignin('base','l_lb',h.l_lb);
 assignin('base','l_d1',h.l_d1);
@@ -86,11 +83,7 @@ assignin('base','p_fluid',101325);
     assignin('base','w_in',h.w_in);
 
 % boundary conditions - general
-    if h.r_c == 0
-        assignin('base','tmp',{h.b1.bc.z(1,1); h.b1.bc.z(2,:)});
-    else
-        assignin('base','tmp',{h.b1.bc.z(1,1:3); h.b1.bc.z(2,:)});
-    end
+    assignin('base','tmp',{h.b1.bc.z(1,1:3); h.b1.bc.z(2,:)});
     evalin('base','b1.bc.z=tmp;');
     
     assignin('base','tmp',{h.b1.bc.r(1,1:3); h.b1.bc.r(2,1:3)});
@@ -113,7 +106,7 @@ assignin('base','p_fluid',101325);
     assignin('base','NS',h.NS);
     
 % boundary conditions - functions on boundaries
-    if h.r_c == 0
+    if h.r_c == 0 && strcmp(h.b1.bc.z(1,1),'a')
         assignin('base','tmp',{'@(z)0'; '@(z)0'});
     else
         assignin('base','tmp',h.b1.bc.rhs.T.z);

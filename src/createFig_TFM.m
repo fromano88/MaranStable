@@ -237,7 +237,7 @@
     
 % subpanels
     h.gy.pl.lengths = uipanel('parent',h.pl.geometry,'units','pix',...
-        'pos',[20 530-80*w 680 170],'title','Lengths');
+        'pos',[20 530-80*w 680 170],'title','Heights');
     h.gy.pl.radii = uipanel('parent',h.pl.geometry,'units','pix','pos',...
         [20 330-80*w 680 170],'title','Radii');
     
@@ -738,9 +738,9 @@
     h.bc.rb.axialLB.d2.conductive = uicontrol(h.bc.bg.axialLB.d2(3),RC{:});
     % --------------------------------------------------------------------
     h.bc.rb.radialLB.rc.wall       = uicontrol(h.bc.bg.radialLB.rc(1),...
-        RS{:},'string','No Penetration','enable','off');
+        RS{:},'string','No Penetration','enable','on');
     h.bc.rb.radialLB.rc.axis       = uicontrol(h.bc.bg.radialLB.rc(1),...
-        RN{:},'string','Symmetry','enable','inactive');
+        RN{:},'string','Symmetry','enable','on');
     h.bc.rb.radialLB.rc.adiabatic  = uicontrol(h.bc.bg.radialLB.rc(3),RA{:});
     h.bc.rb.radialLB.rc.conductive = uicontrol(h.bc.bg.radialLB.rc(3),RC{:});
     h.bc.rb.radialLB.ri.rigid  = uicontrol(h.bc.bg.radialLB.ri(1),...
@@ -815,7 +815,7 @@
     
 % popup menus
     h.bc.pm.headline = uicontrol('parent',h.pl.bcs,'style','pop',...
-        'pos',[373 683-75*w 88 24],'string',{'radial','axial'});
+        'pos',[373 683-75*w 92 24],'string',{'inner/outer','top/bottom'});
     % --------------------------------------------------------------------
     h.bc.pm.axialLB.d1.temperature = uicontrol(PM{:},h.bc.pl.axialLB.d1(3));
     h.bc.pm.axialLB.d2.temperature = uicontrol(PM{:},h.bc.pl.axialLB.d2(3));
@@ -870,9 +870,9 @@
 % static texts
     h.bc.st.headline1 = uicontrol(ST{:},[60 687-75*w 310 17],'parent',...
         h.pl.bcs,'HorizontalAlignment','right','string',...
-        'Liquid Phase: Boundary Conditions in');
-    h.bc.st.headline2 = uicontrol(ST{:},[464 687-75*w 100 17],'parent',...
-        h.pl.bcs,'string','Direction');
+        'Liquid Phase: Boundary Conditions on');
+    h.bc.st.headline2 = uicontrol(ST{:},[469 687-75*w 100 17],'parent',...
+        h.pl.bcs,'string','Boundary');
     % --------------------------------------------------------------------
     h.bc.st.axialLB.d1.temperature = uicontrol(TT{:},h.bc.pl.axialLB.d1(3));
     h.bc.st.axialLB.d2.temperature = uicontrol(TT{:},h.bc.pl.axialLB.d2(3));
@@ -945,7 +945,7 @@
     B = {'parent',h.sn.pl.simulation(2),'units','pix','pos',[25 24+1*w 76 25],'visible','on','string'};
     h.sn.pb.run = uicontrol(B{:},'Run','parent',h.sn.pl.simulation(1),...
         'pos',[224 20 76 25],'ForegroundColor',h.selectedTabColor);
-    h.sn.pb.pause = uicontrol(B{:},'Pause','parent',h.sn.pl.simulation(1),...
+    h.sn.pb.stop = uicontrol(B{:},'Stop','parent',h.sn.pl.simulation(1),...
         'pos',[224 20 76 25],'ForegroundColor',h.unselectedTabColor,'visible','off');
     h.sn.pb.load = uicontrol(B{:},'Load');
     h.sn.pb.save = uicontrol(B{:},'Save','pos',[130 24+1*w 76 25]);
@@ -1042,8 +1042,13 @@
     S = {'units','pix','style','text','HorizontalAlignment'};
     
 % subpanels, subpanels
+    if ispc
+        txt_wavenumber = 'Wave Numbers along φ';
+    else
+        txt_wavenumber = 'Wave Numbers in φ';
+    end
     h.sy.pl.eigs = uipanel(P{:},[20 585-80*w 325 130],'title','Eigenvalue Solver');
-    h.sy.pl.m = uipanel(P{:},[355 585-80*w 145 130],'title','Wave Numbers');
+    h.sy.pl.m = uipanel(P{:},[355 585-80*w 145 130],'title',txt_wavenumber);
     h.sy.pl.conv = uipanel(P{:},[510 585-80*w 190 65],'title','Zero Growth Rate');
     h.sy.pl.run(1) = uipanel(P{:},[20 500-80*w 680 75],'title','Linear Stability Analysis');
     h.sy.pl.run(2) = uipanel('units','pix','parent', ...

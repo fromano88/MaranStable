@@ -29,7 +29,7 @@ h.dim = 1; h.unity = 'mm';
     end
     
 % show streamlines or temperature isolines
-    h.streamlines = 1; h.temperatureIsolines = 0; h.ct.color.sf = '[0 0 0]';
+    h.streamlines = 0; h.temperatureIsolines = 0; h.ct.color.sf = '[0 0 0]';
     h.numStreamlines = 8; h.numTemperatureIsolines = 10; h.ct.color.T = '[0 0 0]';
 
 % default values for line plot
