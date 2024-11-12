@@ -1,18 +1,20 @@
-# MaranStable 3.1
+# MaranStable 3.x
 
 MaranStable was developed at TU Wien in the Institute of Fluid Mechanics and Heat Transfer under the guidance of Professor Hendrik C. Kuhlmann. Michael Lukasser developed MaranStable 1.0 in the framework of the project Engineering Marangoni Flows (EMA), which was supported by FFG. Mario Stojanovic took over in the framework of the project SAJE, which is the acronym of the FFG Project Stability Analysis for the JEREMI Experiment. He developed MaranStable 2.x and MaranStable 3.x with the help of Francesco Romanò, where they removed several bugs, extended the source code by many features, and created a graphical user interface (GUI) for MaranStable.
 _________________
 
-How to use MaranStable 3.1?
+How to use MaranStable 3.x?
 
 There are two possibilities:
-   1) Open Matlab and run the "main.m" file in the main directory. Note that MaranStable 3.1 is only supported on Windows and Linux.
-   2) You can install the stand-alone application by running the executable "MS3.1_win.exe" on a Windows machine or "MS3.1_linux.install" on a Linux machine. You find both files in the "bin" folder. There, you also find additional readme_*.txt files that guide through the installation.
+   1) Open Matlab and run the "main.m" file in the main directory. Note that MaranStable 3.x is only supported on Windows and Linux.
+   2) You can install the stand-alone application by running the executable "MS3.x_win.exe" on a Windows machine or "MS3.x_linux.install" on a Linux machine. You find both files in the "bin" folder. There, you also find additional readme_*.txt files that guide through the installation.
 
 In both cases, the software requires Matlab Version R2022a or newer. All source files required to run MaranStable 3.1 are stored in the "src" folder.
 _________________
 
-Load our tutorial cases from the folder "tutorials" and go through "tutorials.pdf" in the "docs" folder to get started with MaranStable 3.1. They are intended to guide you all the way to the results provided in the paper "MaranStable: A linear stability solver for multiphase flows in canonical geometries" by M. Stojanovic et al. (2023).
+Load our tutorial cases from the folder "tutorials" and go through "tutorials.pdf" in the "docs" folder to get started with MaranStable 3.x. 
+They are intended to guide you all the way to the results provided for MaranStable 3.1 in the paper "MaranStable: A linear stability solver for multiphase flows in canonical geometries" by M. Stojanovic et al. (2023).
+The changes implemented in MaranStable 3.2 are solely concerning the energy equation for the fully-temperature dependent (FTD) and the linear-temperature dependent (LTD) solvers, where the term describing the advection of the specific heat has been implemented following Bird et al. (2001) "Transport Phenomena", 2nd Edition, J. Wiley, New York. 
 _________________
 
 Supplementary material:
