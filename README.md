@@ -9,7 +9,7 @@ There are two possibilities:
    1) Open Matlab and run the "main.m" file in the main directory. Note that MaranStable 3.x is only supported on Windows and Linux.
    2) You can install the stand-alone application by running the executable "MS3.x_win.exe" on a Windows machine or "MS3.x_linux.install" on a Linux machine. You find both files in the "bin" folder. There, you also find additional readme_*.txt files that guide through the installation.
 
-In both cases, the software requires Matlab Version R2022a or newer. All source files required to run MaranStable 3.1 are stored in the "src" folder.
+In both cases, the software requires Matlab Version R2022a or newer. All source files required to run MaranStable 3.x are stored in the "src" folder.
 _________________
 
 Load our tutorial cases from the folder "tutorials" and go through "tutorials.pdf" in the "docs" folder to get started with MaranStable 3.x. 
