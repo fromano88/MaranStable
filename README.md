@@ -34,7 +34,7 @@ The supplementary material is stored in the "docs" folder and contains:
       Is a guide on how to arrive at the results presented in the main paper and includes some more cases.
 
    5) "VDI.pdf", "Shin-Etsu04.pdf":   
-      These files provide the temperature dependence of all material parameters implemented in MaranStable 3.1. For the silicone oils, the manufacturers do not specify the temperature dependence of the surface tension coefficient and of the kinematic viscosity. For these quantities, please see:
+      These files provide the temperature dependence of all material parameters implemented in MaranStable 3.x. For the silicone oils, the manufacturers do not specify the temperature dependence of the surface tension coefficient and of the kinematic viscosity. For these quantities, please see:
       
       [1] I. Ueno et. al., Phys. Fluids 15, 408-416 (2003)
       
