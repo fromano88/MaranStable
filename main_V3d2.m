@@ -3,7 +3,7 @@ function main_V3d2
 evalin('base','clearvars'); close all; clc
 
 % comment next line for standalone applications and put all files in the one folder
-% evalin('base','addpath(''./src'');')
+evalin('base','addpath(''./src'');')
 
 MS_version = 'MaranStable 3.2';
 
