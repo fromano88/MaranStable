@@ -14,7 +14,7 @@ _________________
 
 Load our tutorial cases from the folder "tutorials" and go through "tutorials.pdf" in the "docs" folder to get started with MaranStable 3.x. 
 They are intended to guide you all the way to the results provided for MaranStable 3.1 in the paper "MaranStable: A linear stability solver for multiphase flows in canonical geometries" by M. Stojanovic et al. (2023).
-The changes implemented in MaranStable 3.2 are solely concerning the energy equation for the fully-temperature dependent (FTD) and the linear-temperature dependent (LTD) solvers, where the term describing the advection of the specific heat has been implemented following Bird et al. (2001) "Transport Phenomena", 2nd Edition, J. Wiley, New York. 
+The changes implemented in MaranStable 3.2 are solely concerning the energy equation for the fully temperature-dependent (FTD) and the linearly temperature-dependent (LTD) solvers, where the term describing the advection of the specific heat has been implemented following Bird et al. (2001) "Transport Phenomena", 2nd Edition, J. Wiley, New York. 
 _________________
 
 Supplementary material:
